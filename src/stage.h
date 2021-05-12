@@ -26,6 +26,7 @@ public:
 	Stage();
 };
 
+
 class IntroStage : public Stage {
 public:
 	Image image_intro;

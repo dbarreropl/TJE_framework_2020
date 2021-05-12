@@ -63,8 +63,8 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	Scene::instance = NULL;
 	new Scene();
 
-	islandMesh = Mesh::Get("data/island/island.ASE");
-	islandTexture = Texture::Get("data/island/island_color_luz.tga");
+	//islandMesh = Mesh::Get("data/island/island.ASE");
+	//islandTexture = Texture::Get("data/island/island_color_luz.tga");
 
 	islandMesh = Mesh::Get("data/space/mt/alien.obj");
 	islandTexture = Texture::Get("data/space/mt/alien.png");

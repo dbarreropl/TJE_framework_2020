@@ -7,6 +7,7 @@ Stage::Stage()
 {
 }
 
+
 //IntroStage
 void IntroStage::render(std::vector<Stage*> stages) {
 	Scene::instance->entities[1]->render();
