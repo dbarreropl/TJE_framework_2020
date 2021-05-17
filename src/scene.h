@@ -13,6 +13,7 @@ public:
 
 	static Scene* instance;
 	std::vector <Entity*> entities;
+
 	
 	int numPrefabs = 0;
 	int numCameras = 0;
@@ -24,4 +25,5 @@ public:
 	Scene();
 public:
 	void addEntity(Entity* Entity);
+	void loadScene();
 };

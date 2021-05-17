@@ -10,7 +10,11 @@ Stage::Stage()
 
 //IntroStage
 void IntroStage::render(std::vector<Stage*> stages) {
-	Scene::instance->entities[1]->render();
+	//Scene::instance->entities.size()
+	for (int i = 1; i < Scene::instance->entities.size(); i++) {
+		Scene::instance->entities[i]->render();
+	}
+	//Scene::instance->entities[2]->render();
 
 }
 

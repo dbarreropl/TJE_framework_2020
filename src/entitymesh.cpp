@@ -1,12 +1,12 @@
 #include "entitymesh.h"
 
-EntityMesh::EntityMesh(Mesh* mesh, Texture* texture, Shader* shader)
+EntityMesh::EntityMesh(const char* mesh, const char* texture)
 {
-	this->mesh = mesh;
-	this->texture = texture;
-	this->shader = shader;
+	this->mesh = Mesh::Get(mesh);
+	this->texture = Texture::Get(texture);
+	this->shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
 
-	this->box_world = transformBoundingBox(this->model, mesh->box);
+	this->box_world = transformBoundingBox(this->model, this->mesh->box);
 }
 
 void EntityMesh::render() {
@@ -17,8 +17,8 @@ void EntityMesh::render() {
 		Camera* camera = (Camera*)Scene::instance->entities[0];
 		//if the object is moving
 		box_world = transformBoundingBox(this->model, mesh->box);
-		if(camera->testBoxInFrustum(this->box_world.center, this->box_world.halfsize)){
-		//if (camera->testSphereInFrustum(this->position_world(), mesh->radius)) {
+		//if(camera->testBoxInFrustum(this->box_world.center, this->box_world.halfsize)){
+		if (camera->testSphereInFrustum(this->position_world(), mesh->radius)) {
 			//enable shader
 			//shader->enable();
 

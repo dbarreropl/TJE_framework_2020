@@ -28,7 +28,7 @@ public:
 	};
 	EntityMeshType type;
 
-	EntityMesh(Mesh* mesh, Texture* texture, Shader* shader);
+	EntityMesh(const char* mesh, const char* texture);
 	void render();
 	//void update(float dt);
 	Vector3 position_world() { return this->model * mesh->box.center; }

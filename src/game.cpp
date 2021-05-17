@@ -62,19 +62,31 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	//Scene
 	Scene::instance = NULL;
 	new Scene();
+	
 
-	//islandMesh = Mesh::Get("data/island/island.ASE");
-	//islandTexture = Texture::Get("data/island/island_color_luz.tga");
+	islandMesh = Mesh::Get("data/island/island.ASE");
+	islandTexture = Texture::Get("data/island/island_color_luz.tga");
 
-	islandMesh = Mesh::Get("data/space/mt/alien.obj");
-	islandTexture = Texture::Get("data/space/mt/alien.png");
-
+	//...addobjectinfront
+	mesh = Mesh::Get("data/biglib/WesternPack/Envyrontment/SM_Env_Sand_Ground_06_47.obj");
+	texture = Texture::Get("data/biglib/WesternPack/texture.tga");
 	shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
-
-	Entity* island = new EntityMesh(islandMesh, islandTexture, shader);
+	
 	Scene::instance->addEntity(camera);
-	Scene::instance->addEntity(island);
 
+	//Entity* floor = new EntityMesh("data/a2.obj", "data/biglib/WesternPack/texture.tga");
+	//Scene::instance->addEntity(floor);
+	Scene::instance->loadScene();
+
+	/*
+	Entity* floor;
+	for (int i = 0; i < 10; i++) {
+		for (int j = 0; j < 10; j++) {
+			floor = new EntityMesh(mesh, texture, shader);
+			floor->model.setTranslation(i * mesh->box.halfsize.x * 1.8, 0.0f, j * mesh->box.halfsize.z * 1.8);
+			Scene::instance->addEntity(floor);
+		}
+	}*/
 
 	//hide the cursor
 	SDL_ShowCursor(!mouse_locked); //hide or show the mouse
@@ -100,6 +112,7 @@ void Game::render(void)
 	shader->enable();
 	Stage::current_stage->render(stages);
 	//Scene::instance->entities[1]->render();
+
 	shader->disable();
 
 	//Draw the floor grid
