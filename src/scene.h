@@ -19,6 +19,7 @@ public:
 	int numCameras = 0;
 	int numLights = 0;
 	bool floor = FALSE;
+	bool loaded = FALSE;
 
 	//Shader* current_shader = NULL;
 

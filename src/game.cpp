@@ -17,7 +17,7 @@ Texture* texture = NULL;
 Shader* shader = NULL;
 Animation* anim = NULL;
 float angle = 0;
-float mouse_speed = 100.0f;
+float mouse_speed = 50.0f;
 FBO* fbo = NULL;
 
 Mesh* islandMesh = NULL;
@@ -62,7 +62,6 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	//Scene
 	Scene::instance = NULL;
 	new Scene();
-	
 
 	islandMesh = Mesh::Get("data/island/island.ASE");
 	islandTexture = Texture::Get("data/island/island_color_luz.tga");
@@ -74,9 +73,9 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	
 	Scene::instance->addEntity(camera);
 
-	//Entity* floor = new EntityMesh("data/a2.obj", "data/biglib/WesternPack/texture.tga");
-	//Scene::instance->addEntity(floor);
-	Scene::instance->loadScene();
+	Entity* island = new EntityMesh("data/island/island.ASE", "data/island/island_color_luz.tga");
+	Scene::instance->addEntity(island);
+	//Scene::instance->loadScene();
 
 	/*
 	Entity* floor;
@@ -110,16 +109,11 @@ void Game::render(void)
 	glDisable(GL_CULL_FACE);
    
 	shader->enable();
+
 	Stage::current_stage->render(stages);
 	//Scene::instance->entities[1]->render();
 
 	shader->disable();
-
-	//Draw the floor grid
-	drawGrid();
-
-	//render the FPS, Draw Calls, etc
-	drawText(2, 2, getGPUStats(), Vector3(1, 1, 1), 2);
 
 	//swap between front buffer and back buffer
 	SDL_GL_SwapWindow(this->window);

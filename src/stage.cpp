@@ -7,23 +7,18 @@ Stage::Stage()
 {
 }
 
-
 //IntroStage
 void IntroStage::render(std::vector<Stage*> stages) {
-	//Scene::instance->entities.size()
-	for (int i = 1; i < Scene::instance->entities.size(); i++) {
-		Scene::instance->entities[i]->render();
-	}
-	//Scene::instance->entities[2]->render();
+
+	drawText(100, 100, "LOADING", Vector3(1, 1, 1), 15);
 
 }
 
 void IntroStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
-
-	if (Input::wasKeyPressed(SDL_SCANCODE_SPACE))
-	{
-		this->current_stage = stages[3];
-	}
+	
+	Scene::instance->loadScene();
+	this->current_stage = stages[2];
+	
 }
 
 //TutoStage
@@ -34,10 +29,7 @@ void TutoStage::render(std::vector<Stage*> stages) {
 
 void TutoStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
 
-	if (Input::wasKeyPressed(SDL_SCANCODE_SPACE))
-	{
-		this->current_stage = stages[2];
-	}
+
 }
 
 //MenuStage
@@ -50,7 +42,7 @@ void MenuStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
 
 	if (Input::wasKeyPressed(SDL_SCANCODE_ESCAPE)) //if key ESC was pressed
 	{
-		this->current_stage = stages[2];
+		
 	}
 
 	if (Input::wasKeyPressed(SDL_SCANCODE_UP)) //if key up
@@ -65,14 +57,23 @@ void MenuStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
 
 	if (Input::wasKeyPressed(SDL_SCANCODE_SPACE)) //if key space
 	{
-		this->current_stage = stages[0];
+		
 	}
 }
 
 //PlayStage
 void PlayStage::render(std::vector<Stage*> stages) {
 	
+	for (int i = 2; i < Scene::instance->entities.size(); i++) {
+		Scene::instance->entities[i]->render();
+	}
+	//Scene::instance->entities[2]->render();
+	
+	//Draw the floor grid
+	drawGrid();
 
+	//render the FPS, Draw Calls, etc
+	drawText(2, 2, getGPUStats(), Vector3(1, 1, 1), 2);
 }
 
 void PlayStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
@@ -97,7 +98,7 @@ void PlayStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
 
 	if (Input::wasKeyPressed(SDL_SCANCODE_ESCAPE)) //if key ESC was pressed
 	{
-		this->current_stage = stages[1];
+		
 	}
 
 	//example of 'was pressed'
@@ -127,6 +128,6 @@ void EndStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
 
 	if (Input::wasKeyPressed(SDL_SCANCODE_ESCAPE))
 	{
-		this->current_stage = stages[0];
+		
 	}
 }
