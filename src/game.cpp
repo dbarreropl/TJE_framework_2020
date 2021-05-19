@@ -20,9 +20,6 @@ float angle = 0;
 float mouse_speed = 50.0f;
 FBO* fbo = NULL;
 
-Mesh* islandMesh = NULL;
-Texture* islandTexture = NULL;
-
 //stages
 std::vector<Stage*> stages;
 
@@ -48,7 +45,7 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 
 	//create our camera
 	camera = new Camera();
-	camera->lookAt(Vector3(0.f,100.f, 100.f),Vector3(0.f,0.f,0.f), Vector3(0.f,1.f,0.f)); //position the camera and point to 0,0,0
+	camera->lookAt(Vector3(4.7f, 2.5f, 11.2f),Vector3(0.f,0.f,0.f), Vector3(0.f,1.f,0.f)); //position the camera and point to 0,0,0
 	camera->setPerspective(70.f,window_width/(float)window_height,0.1f,10000.f); //set the projection, we want to be perspective
 
 	//Create Stages
@@ -63,9 +60,6 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	Scene::instance = NULL;
 	new Scene();
 
-	islandMesh = Mesh::Get("data/island/island.ASE");
-	islandTexture = Texture::Get("data/island/island_color_luz.tga");
-
 	//...addobjectinfront
 	mesh = Mesh::Get("data/biglib/WesternPack/Envyrontment/SM_Env_Sand_Ground_06_47.obj");
 	texture = Texture::Get("data/biglib/WesternPack/texture.tga");
@@ -73,9 +67,10 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	
 	Scene::instance->addEntity(camera);
 
-	Entity* island = new EntityMesh("data/island/island.ASE", "data/island/island_color_luz.tga");
-	Scene::instance->addEntity(island);
-	//Scene::instance->loadScene();
+	Entity* sky = new EntityMesh("data/skydome.obj", "data/skydome.png");
+	sky->model.scale(24.973,24.973,24.973);
+	sky->render_always = 1;
+	Scene::instance->addEntity(sky);
 
 	/*
 	Entity* floor;
@@ -111,7 +106,6 @@ void Game::render(void)
 	shader->enable();
 
 	Stage::current_stage->render(stages);
-	//Scene::instance->entities[1]->render();
 
 	shader->disable();
 
@@ -128,23 +122,25 @@ void Game::update(double seconds_elapsed)
 	//example
 	//angle += (float)seconds_elapsed * 10.0f;
 
-	//mouse input to rotate the cam
-	if ((Input::mouse_state & SDL_BUTTON_LEFT) || mouse_locked ) //is left button pressed?
-	{
-		camera->rotate(Input::mouse_delta.x * 0.005f, Vector3(0.0f,-1.0f,0.0f));
-		camera->rotate(Input::mouse_delta.y * 0.005f, camera->getLocalVector( Vector3(-1.0f,0.0f,0.0f)));
+	if (Scene::instance->mode == 0) {
+		//mouse input to rotate the cam
+		if ((Input::mouse_state & SDL_BUTTON_LEFT) || mouse_locked) //is left button pressed?
+		{
+			camera->rotate(Input::mouse_delta.x * 0.005f, Vector3(0.0f, -1.0f, 0.0f));
+			camera->rotate(Input::mouse_delta.y * 0.005f, camera->getLocalVector(Vector3(-1.0f, 0.0f, 0.0f)));
+		}
+
+		//async input to move the camera around
+		if (Input::isKeyPressed(SDL_SCANCODE_LSHIFT)) speed *= 10; //move faster with left shift
+		if (Input::isKeyPressed(SDL_SCANCODE_W) || Input::isKeyPressed(SDL_SCANCODE_UP)) camera->move(Vector3(0.0f, 0.0f, 1.0f) * speed);
+		if (Input::isKeyPressed(SDL_SCANCODE_S) || Input::isKeyPressed(SDL_SCANCODE_DOWN)) camera->move(Vector3(0.0f, 0.0f, -1.0f) * speed);
+		if (Input::isKeyPressed(SDL_SCANCODE_A) || Input::isKeyPressed(SDL_SCANCODE_LEFT)) camera->move(Vector3(1.0f, 0.0f, 0.0f) * speed);
+		if (Input::isKeyPressed(SDL_SCANCODE_D) || Input::isKeyPressed(SDL_SCANCODE_RIGHT)) camera->move(Vector3(-1.0f, 0.0f, 0.0f) * speed);
+
+		//to navigate with the mouse fixed in the middle
+		if (mouse_locked)
+			Input::centerMouse();
 	}
-
-	//async input to move the camera around
-	if(Input::isKeyPressed(SDL_SCANCODE_LSHIFT) ) speed *= 10; //move faster with left shift
-	if (Input::isKeyPressed(SDL_SCANCODE_W) || Input::isKeyPressed(SDL_SCANCODE_UP)) camera->move(Vector3(0.0f, 0.0f, 1.0f) * speed);
-	if (Input::isKeyPressed(SDL_SCANCODE_S) || Input::isKeyPressed(SDL_SCANCODE_DOWN)) camera->move(Vector3(0.0f, 0.0f,-1.0f) * speed);
-	if (Input::isKeyPressed(SDL_SCANCODE_A) || Input::isKeyPressed(SDL_SCANCODE_LEFT)) camera->move(Vector3(1.0f, 0.0f, 0.0f) * speed);
-	if (Input::isKeyPressed(SDL_SCANCODE_D) || Input::isKeyPressed(SDL_SCANCODE_RIGHT)) camera->move(Vector3(-1.0f,0.0f, 0.0f) * speed);
-
-	//to navigate with the mouse fixed in the middle
-	if (mouse_locked)
-		Input::centerMouse();
 }
 
 //Keyboard event handler (sync input)

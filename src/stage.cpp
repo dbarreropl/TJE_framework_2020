@@ -10,7 +10,7 @@ Stage::Stage()
 //IntroStage
 void IntroStage::render(std::vector<Stage*> stages) {
 
-	drawText(100, 100, "LOADING", Vector3(1, 1, 1), 15);
+	drawText(100, 450, "LOADING...", Vector3(1, 1, 1), 8);
 
 }
 
@@ -63,20 +63,31 @@ void MenuStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
 
 //PlayStage
 void PlayStage::render(std::vector<Stage*> stages) {
-	
+
+	Scene::instance->entities[1]->render(); //sky
+
 	for (int i = 2; i < Scene::instance->entities.size(); i++) {
 		Scene::instance->entities[i]->render();
 	}
-	//Scene::instance->entities[2]->render();
-	
-	//Draw the floor grid
-	drawGrid();
 
-	//render the FPS, Draw Calls, etc
-	drawText(2, 2, getGPUStats(), Vector3(1, 1, 1), 2);
+	if (Scene::instance->mode == 0)
+		drawGrid(); //Draw the floor grid
+
+	drawText(2, 2, getGPUStats(), Vector3(1, 1, 1), 2); //render the FPS, Draw Calls, etc
+
 }
 
 void PlayStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
+
+	//change free camera
+	if (Input::wasKeyPressed(SDL_SCANCODE_L))
+	{
+		if (Scene::instance->mode == 0)
+			Scene::instance->mode = 1;
+		else
+			Scene::instance->mode = 0;
+	}
+
 
 	//keys
 	if (Input::isKeyPressed(SDL_SCANCODE_UP)) //if key up
@@ -99,12 +110,6 @@ void PlayStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
 	if (Input::wasKeyPressed(SDL_SCANCODE_ESCAPE)) //if key ESC was pressed
 	{
 		
-	}
-
-	//example of 'was pressed'
-	if (Input::wasKeyPressed(SDL_SCANCODE_A)) //if key A was pressed
-	{
-
 	}
 
 	//to read the gamepad state

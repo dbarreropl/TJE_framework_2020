@@ -18,8 +18,9 @@ public:
 	int numPrefabs = 0;
 	int numCameras = 0;
 	int numLights = 0;
-	bool floor = FALSE;
 	bool loaded = FALSE;
+
+	bool mode=0;
 
 	//Shader* current_shader = NULL;
 

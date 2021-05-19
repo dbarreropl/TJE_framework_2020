@@ -6,9 +6,7 @@ Scene* Scene::instance = NULL;
 Scene::Scene()
 {
 	assert(instance == NULL);
-
 	instance = this;
-	
 }
 
 void Scene::addEntity(Entity* Entity){
@@ -38,6 +36,8 @@ void Scene::loadScene() {
 		Entity* entity;
 		if (!data_spl[0].find("SM_Bld_Sign"))
 			entity = new EntityMesh(("data/biglib/WesternPack_renamed/All/"+data_spl[0]).c_str(),"data/biglib/WesternPack_renamed/texture2.tga");
+		else if(!data_spl[0].find("SM_Env_BackgroundCard"))
+			entity = new EntityMesh(("data/biglib/WesternPack_renamed/All/" + data_spl[0]).c_str(), "data/biglib/WesternPack_renamed/texture3.tga");
 		else
 			entity = new EntityMesh(("data/biglib/WesternPack_renamed/All/" + data_spl[0]).c_str(), "data/biglib/WesternPack_renamed/texture.tga");
 

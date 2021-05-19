@@ -18,7 +18,7 @@ void EntityMesh::render() {
 		//if the object is moving
 		box_world = transformBoundingBox(this->model, mesh->box);
 		//if(camera->testBoxInFrustum(this->box_world.center, this->box_world.halfsize)){
-		if (camera->testSphereInFrustum(this->position_world(), mesh->radius)) {
+		if (this->render_always == TRUE || camera->testSphereInFrustum(this->position_world(), mesh->radius)) {
 			//enable shader
 			//shader->enable();
 

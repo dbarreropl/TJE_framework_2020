@@ -9,6 +9,7 @@ public:
 	Matrix44 model;
 	
 	bool visible;
+	bool render_always=0;
 	enum eType {
 		PREFAB,
 		CAMERA,
