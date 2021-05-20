@@ -14,10 +14,14 @@
 //some globals
 Mesh* mesh = NULL;
 Texture* texture = NULL;
+
+Mesh* player_mesh = NULL;
+Texture* player_texture = NULL;
+
 Shader* shader = NULL;
 Animation* anim = NULL;
 float angle = 0;
-float mouse_speed = 50.0f;
+float mouse_speed = 10.0f;
 FBO* fbo = NULL;
 
 //stages
@@ -45,8 +49,8 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 
 	//create our camera
 	camera = new Camera();
-	camera->lookAt(Vector3(4.7f, 2.5f, 11.2f),Vector3(0.f,0.f,0.f), Vector3(0.f,1.f,0.f)); //position the camera and point to 0,0,0
 	camera->setPerspective(70.f,window_width/(float)window_height,0.1f,10000.f); //set the projection, we want to be perspective
+	camera->setType(1);
 
 	//Create Stages
 	stages.push_back(new IntroStage());
@@ -67,10 +71,25 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	
 	Scene::instance->addEntity(camera);
 
+	//sky
 	Entity* sky = new EntityMesh("data/skydome.obj", "data/skydome.png");
 	sky->model.scale(24.973,24.973,24.973);
 	sky->render_always = 1;
+	sky->setType(0);
 	Scene::instance->addEntity(sky);
+
+	//player
+	Entity* player = new Player("data/biglib/WesternPack_renamed/All/Character_Badguy_01_10.obj", "data/biglib/WesternPack_renamed/texture.tga");
+	player->model.setTranslation(4.700, 1.125, 11.400);
+	player->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
+	player->render_always = 1;
+	player->setType(3);
+	Scene::instance->addEntity(player);
+
+	//set camera to player pos
+	Camera* cam = (Camera*)Scene::instance->cameras[0];
+	Vector3 player_pos = Scene::instance->players[0]->model.getTranslation();
+	cam->lookAt(Vector3(player_pos.x, player_pos.y + 1.675, player_pos.z - 0.2), Vector3(player_pos.x + 0.3, player_pos.y + 1.675, player_pos.z - 2.5), Vector3(0.f, 1.f, 0.f));
 
 	/*
 	Entity* floor;
@@ -115,13 +134,27 @@ void Game::render(void)
 
 void Game::update(double seconds_elapsed)
 {
-	Stage::current_stage->update(seconds_elapsed, stages);
 
 	float speed = seconds_elapsed * mouse_speed; //the speed is defined by the seconds_elapsed so it goes constant
 
 	//example
 	//angle += (float)seconds_elapsed * 10.0f;
 
+	//change edit/play mode
+	Camera* cam = (Camera*)Scene::instance->cameras[0];
+	Vector3 player_pos = Scene::instance->players[0]->model.getTranslation();
+	if (Input::wasKeyPressed(SDL_SCANCODE_L) && Stage::current_stage->getStage()==2)
+	{
+		if (Scene::instance->mode == 0) {
+			Scene::instance->mode = 1;
+			//camara set to player pos
+			cam->lookAt(Vector3(player_pos.x, player_pos.y + 1.675, player_pos.z-0.2), Vector3(player_pos.x+0.3, player_pos.y + 1.675, player_pos.z - 2.5), Vector3(0.f, 1.f, 0.f));
+		}
+		else
+			Scene::instance->mode = 0;
+	}
+
+	//free camera
 	if (Scene::instance->mode == 0) {
 		//mouse input to rotate the cam
 		if ((Input::mouse_state & SDL_BUTTON_LEFT) || mouse_locked) //is left button pressed?
@@ -141,6 +174,9 @@ void Game::update(double seconds_elapsed)
 		if (mouse_locked)
 			Input::centerMouse();
 	}
+	else
+		Stage::current_stage->update(seconds_elapsed, stages);
+
 }
 
 //Keyboard event handler (sync input)

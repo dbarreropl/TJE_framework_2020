@@ -5,7 +5,7 @@
 #include "light.h"
 #include "entitymesh.h"
 #include "camera.h"
-
+#include "player.h"
 
 class Scene
 {
@@ -13,14 +13,13 @@ public:
 
 	static Scene* instance;
 	std::vector <Entity*> entities;
-
+	std::vector <Entity*> players;
+	std::vector <Entity*> cameras;
+	std::vector <Entity*> lights;
 	
-	int numPrefabs = 0;
-	int numCameras = 0;
-	int numLights = 0;
 	bool loaded = FALSE;
 
-	bool mode=0;
+	bool mode=1; //mode edit=0, mode play=1
 
 	//Shader* current_shader = NULL;
 

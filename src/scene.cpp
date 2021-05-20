@@ -10,14 +10,23 @@ Scene::Scene()
 }
 
 void Scene::addEntity(Entity* Entity){
+	//Scene::instance->entities.push_back(Entity);
 	
-	Scene::instance->entities.push_back(Entity);
-	if(Entity->type == 0)
-		this->numPrefabs += 1;
-	else if(Entity->type == 1)
-		this->numCameras += 1;
-	else if(Entity->type == 2)
-		this->numLights += 1;
+	if (Entity->type == 0) {
+		Scene::instance->entities.push_back(Entity);
+	}
+	else if (Entity->type == 1) {
+		Scene::instance->cameras.push_back(Entity);
+	}
+	else if (Entity->type == 2) {
+		Scene::instance->lights.push_back(Entity);
+	}
+	else if (Entity->type == 3) {
+		Scene::instance->players.push_back(Entity);
+	}
+	else{
+		Scene::instance->entities.push_back(Entity);
+	}
 }
 
 void Scene::loadScene() {
@@ -40,14 +49,17 @@ void Scene::loadScene() {
 			entity = new EntityMesh(("data/biglib/WesternPack_renamed/All/" + data_spl[0]).c_str(), "data/biglib/WesternPack_renamed/texture3.tga");
 		else
 			entity = new EntityMesh(("data/biglib/WesternPack_renamed/All/" + data_spl[0]).c_str(), "data/biglib/WesternPack_renamed/texture.tga");
-
+		
 		//position
 		std::vector <std::string> pos = split(data_spl[1], ',');
 		entity->model.setTranslation(-std::stof(pos[0]), std::stof(pos[1]), std::stof(pos[2]));
 
 		//rotation
 		std::vector <std::string> rot = split(data_spl[2], ',');
-		entity->model.rotate(DEG2RAD * (std::stof(rot[0])), Vector3(1.0f, 0.0f, 0.0f)); //1 where rotation applies
+
+		//if (!data_spl[0].find("SM_Prop_Coffin_01")) {
+
+		entity->model.rotate(DEG2RAD * (std::stof(rot[0])), Vector3(1.0f, 0.0f, 0.0f)); //1 where rotation applies //(std::stof(rot[0])/4)
 		entity->model.rotate(DEG2RAD * (std::stof(rot[1])), Vector3(0.0f, 1.0f, 0.0f));
 		entity->model.rotate(DEG2RAD * (std::stof(rot[2])), Vector3(0.0f, 0.0f, 1.0f));
 
@@ -55,8 +67,12 @@ void Scene::loadScene() {
 		std::vector <std::string> scl = split(data_spl[3], ',');
 		entity->model.scale(std::stof(scl[0]), std::stof(scl[1]), std::stof(scl[2]));
 
+		//type
+		entity->setType(0);
+		
+
 		Scene::instance->addEntity(entity);
 	}
 	this->loaded = TRUE;
-		
+
 }

@@ -13,7 +13,8 @@ public:
 	enum eType {
 		PREFAB,
 		CAMERA,
-		LIGHT
+		LIGHT,
+		PLAYER
 
 	};
 	eType type;
@@ -22,6 +23,7 @@ public:
 	Entity(int id, bool visible );
 	//virtual ~Entity(); //destructor
 
+	void setType(float type) { this->type = (eType)type; }
 	virtual void render() {}
 	//virtual void update(float elapsed_time);
 	//Vector3 getPosition();

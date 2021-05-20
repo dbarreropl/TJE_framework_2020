@@ -6,7 +6,6 @@
 #include "texture.h"
 #include "animation.h"
 #include "shader.h"
-#include "scene.h"
 
 class EntityMesh : public Entity
 {
@@ -20,14 +19,8 @@ public:
 	BoundingBox box_world;
 
 	Vector4 color;
-	enum EntityMeshType {
-		DIRECTIONAL,
-		POINT,
-		SPOT		
 
-	};
-	EntityMeshType type;
-
+	EntityMesh() {};
 	EntityMesh(const char* mesh, const char* texture);
 	void render();
 	//void update(float dt);

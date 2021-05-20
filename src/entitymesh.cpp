@@ -1,4 +1,5 @@
 #include "entitymesh.h"
+#include "scene.h"
 
 EntityMesh::EntityMesh(const char* mesh, const char* texture)
 {
@@ -14,7 +15,7 @@ void EntityMesh::render() {
 	{
 		//get the last camera that was activated
 		//Camera* camera = Camera::current;
-		Camera* camera = (Camera*)Scene::instance->entities[0];
+		Camera* camera = (Camera*)Scene::instance->cameras[0];
 		//if the object is moving
 		box_world = transformBoundingBox(this->model, mesh->box);
 		//if(camera->testBoxInFrustum(this->box_world.center, this->box_world.halfsize)){
@@ -30,12 +31,10 @@ void EntityMesh::render() {
 			shader->setUniform("u_time", time);
 
 			//do the draw call
-			//mesh->render( GL_TRIANGLES );
 			mesh->render(GL_TRIANGLES);
 
 			//disable shader
 			//shader->disable();
-			//... shader enable i disable fuera
 		}
 	}
 
