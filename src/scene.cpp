@@ -10,7 +10,6 @@ Scene::Scene()
 }
 
 void Scene::addEntity(Entity* Entity){
-	//Scene::instance->entities.push_back(Entity);
 	
 	if (Entity->type == 0) {
 		Scene::instance->entities.push_back(Entity);

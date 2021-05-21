@@ -80,16 +80,15 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 
 	//player
 	Entity* player = new Player("data/biglib/WesternPack_renamed/All/Character_Badguy_01_10.obj", "data/biglib/WesternPack_renamed/texture.tga");
-	player->model.setTranslation(4.700, 1.125, 11.400);
+	player->model.setTranslation(4.700, 1.125, 10.400);
 	player->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
 	player->render_always = 1;
 	player->setType(3);
 	Scene::instance->addEntity(player);
 
-	//set camera to player pos
-	Camera* cam = (Camera*)Scene::instance->cameras[0];
-	Vector3 player_pos = Scene::instance->players[0]->model.getTranslation();
-	cam->lookAt(Vector3(player_pos.x, player_pos.y + 1.675, player_pos.z - 0.2), Vector3(player_pos.x + 0.3, player_pos.y + 1.675, player_pos.z - 2.5), Vector3(0.f, 1.f, 0.f));
+	//cam to player pos
+	Player* player_s = (Player*)Scene::instance->players[0];
+	player_s->updateCamera();
 
 	/*
 	Entity* floor;
@@ -141,14 +140,12 @@ void Game::update(double seconds_elapsed)
 	//angle += (float)seconds_elapsed * 10.0f;
 
 	//change edit/play mode
-	Camera* cam = (Camera*)Scene::instance->cameras[0];
-	Vector3 player_pos = Scene::instance->players[0]->model.getTranslation();
+	Player* player = (Player*)Scene::instance->players[0];
 	if (Input::wasKeyPressed(SDL_SCANCODE_L) && Stage::current_stage->getStage()==2)
 	{
 		if (Scene::instance->mode == 0) {
 			Scene::instance->mode = 1;
-			//camara set to player pos
-			cam->lookAt(Vector3(player_pos.x, player_pos.y + 1.675, player_pos.z-0.2), Vector3(player_pos.x+0.3, player_pos.y + 1.675, player_pos.z - 2.5), Vector3(0.f, 1.f, 0.f));
+			player->updateCamera(); //camara set to player pos
 		}
 		else
 			Scene::instance->mode = 0;
@@ -173,6 +170,8 @@ void Game::update(double seconds_elapsed)
 		//to navigate with the mouse fixed in the middle
 		if (mouse_locked)
 			Input::centerMouse();
+
+		SDL_ShowCursor(true);
 	}
 	else
 		Stage::current_stage->update(seconds_elapsed, stages);

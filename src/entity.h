@@ -25,6 +25,7 @@ public:
 
 	void setType(float type) { this->type = (eType)type; }
 	virtual void render() {}
+
 	//virtual void update(float elapsed_time);
 	//Vector3 getPosition();
 };

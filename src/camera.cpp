@@ -110,6 +110,7 @@ void Camera::lookAt(const Vector3& eye, const Vector3& center, const Vector3& up
 	updateViewMatrix();
 }
 
+
 void Camera::lookAt(const Matrix44& m)
 {
 	this->eye = m * Vector3();
