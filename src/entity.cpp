@@ -2,7 +2,7 @@
 
 Entity::Entity()
 {
-
+	this->visible = TRUE;
 }
 
 Entity::Entity(int id, bool visible)

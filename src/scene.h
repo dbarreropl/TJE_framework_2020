@@ -16,6 +16,8 @@ public:
 	std::vector <Entity*> players;
 	std::vector <Entity*> cameras;
 	std::vector <Entity*> lights;
+
+	std::vector <Entity*> bullet_holes;
 	
 	bool loaded = FALSE;
 
@@ -26,5 +28,6 @@ public:
 	Scene();
 public:
 	void addEntity(Entity* Entity);
+	void addBulletHole(Entity* Entity);
 	void loadScene();
 };

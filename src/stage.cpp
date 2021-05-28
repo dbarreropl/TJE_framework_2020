@@ -64,68 +64,90 @@ void MenuStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
 //PlayStage
 void PlayStage::render(std::vector<Stage*> stages) {
 
+	Player* player = (Player*)Scene::instance->players[0];
+	Camera* camera = (Camera*)Scene::instance->cameras[0];
+	if(Scene::instance->mode == 1)
+		player->updateCamera();
+
+	//render
 	Scene::instance->entities[0]->render(); //sky
-	Scene::instance->players[0]->render();
-	for (int i = 1; i < Scene::instance->entities.size(); i++) {
+	Scene::instance->players[0]->render(); //player
+	for (int i = 1; i < Scene::instance->entities.size(); i++) { //entities
 		Scene::instance->entities[i]->render();
 	}
+	
+	//glEnable(GL_CULL_FACE);
+	for (int i = 0; i < Scene::instance->bullet_holes.size(); i++) { //bullet_holes
+		Scene::instance->bullet_holes[i]->render();
+	}
+	//glDisable(GL_CULL_FACE);
 
+	//object selected camara
+	player->boundingSelected();
+
+
+	//Draw the floor grid
 	if (Scene::instance->mode == 0)
-		drawGrid(); //Draw the floor grid
-
-	drawText(2, 2, getGPUStats(), Vector3(1, 1, 1), 2); //render the FPS, Draw Calls, etc
+		drawGrid(); 
+	
+	//render the FPS, Draw Calls, etc
+	drawText(2, 2, getGPUStats(), Vector3(1, 1, 1), 2);
 
 }
 
 void PlayStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
 	//update camara respecto player
+	
 	Camera* camera = (Camera*)Scene::instance->cameras[0];
 	Player* player = (Player*)Scene::instance->players[0];
 
-	//...player.y como altura colision debajo player
-
-	//colision camera
-
-	/*
-	bool iscol=FALSE;
-	Vector3 origin = camera->eye;
-	Vector3 dir = camera->getRayDirection(camera->center.x, camera->center.x, Game::instance->window_width, Game::instance->window_height);
-	for (int i = 0; i < Scene::instance->entities.size(); i++) {
-		EntityMesh* current = (EntityMesh*)Scene::instance->entities[i];
-		Vector3 col;
-		Vector3 normal;
-		if (current->mesh->testRayCollision(current->model, origin, dir, col, normal, 0.1))
-			iscol = TRUE;
-	}*/
-
-	//player colision
-	
-	player->can_move = TRUE;
-	for (int i = 1; i < Scene::instance->entities.size(); i++) {
-		EntityMesh* entity = (EntityMesh*)Scene::instance->entities[i];
-		if (player->testCollision(entity))
-			player->onCollision(entity);
-	}
-
+	//set yaw and pitch player	
+	player->yaw = (Input::mouse_delta.x * seconds_elapsed * 0.75f);
+	player->pitch = clamp(player->pitch + Input::mouse_delta.y * seconds_elapsed * 0.75f, -88 * DEG2RAD, 88 * DEG2RAD);
 
 	//move player
+	player->can_move = TRUE;
+	Matrix44 playerRot;
+	playerRot.setRotation(player->yaw*DEG2RAD, Vector3(0,1,0));
+	Vector3 playerFront = playerRot.rotateVector(Vector3(0.0f,0.0f,-1.0f));
+	Vector3 playerRight = playerRot.rotateVector(Vector3(1.0f, 0.0f, 0.0f));
+	Vector3 playerSpeed = Vector3(0,0,0);
+
 	float speed = seconds_elapsed * 5.0f;
+	
 	if (Input::isKeyPressed(SDL_SCANCODE_LSHIFT)) speed *= 1.75; //move faster with left shift
-	if (Input::isKeyPressed(SDL_SCANCODE_W) || Input::isKeyPressed(SDL_SCANCODE_UP)) player->movePlayer(Vector3(0.0f, 0.0f, 1.0f) * speed);
-	if (Input::isKeyPressed(SDL_SCANCODE_S) || Input::isKeyPressed(SDL_SCANCODE_DOWN)) player->movePlayer(Vector3(0.0f, 0.0f, -1.0f) * speed);
-	if (Input::isKeyPressed(SDL_SCANCODE_A) || Input::isKeyPressed(SDL_SCANCODE_LEFT)) player->movePlayer(Vector3(1.0f, 0.0f, 0.0f) * speed);
-	if (Input::isKeyPressed(SDL_SCANCODE_D) || Input::isKeyPressed(SDL_SCANCODE_RIGHT)) player->movePlayer(Vector3(-1.0f, 0.0f, 0.0f) * speed);
+	if (Input::isKeyPressed(SDL_SCANCODE_W) || Input::isKeyPressed(SDL_SCANCODE_UP)) {
+		playerSpeed = playerSpeed + (playerFront* -speed);
+	}
+	if (Input::isKeyPressed(SDL_SCANCODE_S) || Input::isKeyPressed(SDL_SCANCODE_DOWN)) { 
+		playerSpeed = playerSpeed + (playerFront * speed);
+	}
+	if (Input::isKeyPressed(SDL_SCANCODE_A) || Input::isKeyPressed(SDL_SCANCODE_LEFT)) { 
+		playerSpeed = playerSpeed + (playerRight * speed);
+	}
+	if (Input::isKeyPressed(SDL_SCANCODE_D) || Input::isKeyPressed(SDL_SCANCODE_RIGHT)) { 
+		playerSpeed = playerSpeed + (playerRight * -speed);
+	}
+	player->targetMove = playerSpeed;
+	player->targetPos = player->model.getTranslation() - playerSpeed;
 
-	//set yaw and pitch player
-	player->yaw =  (Input::mouse_delta.x * seconds_elapsed * 0.75f);
-	player->pitch = clamp(player->pitch + Input::mouse_delta.y * seconds_elapsed * 0.75f, -88 * DEG2RAD, 88 * DEG2RAD);
+	//player colision
+	for (int i = 1; i < Scene::instance->entities.size(); i++) {
+		EntityMesh* entity = (EntityMesh*)Scene::instance->entities[i];
+		if(entity->visible==TRUE)
+			if (player->testCollision(entity, player->targetMove))
+				player->onCollision(entity);
+	}
 	
-	player->model.rotate((-Input::mouse_delta.x * seconds_elapsed * 0.75f), Vector3(0.0f, 1.0f, 0.0f));
-	player->updateCamera();
-	
+	player->movePlayer(player->targetMove);
+	player->model.rotate((player->yaw), Vector3(0.0f, -1.0f, 0.0f));
 
-	Input::centerMouse();
-	SDL_ShowCursor(false);
+
+	//shoot
+	if (Input::mouse_state & SDL_BUTTON_RIGHT) //is left button pressed?
+	{
+		player->shoot();
+	}
 
 	if (Input::wasKeyPressed(SDL_SCANCODE_ESCAPE)) //if key ESC was pressed
 	{
@@ -142,6 +164,8 @@ void PlayStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
 		
 	}
 
+	Input::centerMouse();
+	SDL_ShowCursor(false);
 }
 
 //EndStage

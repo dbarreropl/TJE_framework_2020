@@ -65,8 +65,8 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	new Scene();
 
 	//...addobjectinfront
-	mesh = Mesh::Get("data/biglib/WesternPack/Envyrontment/SM_Env_Sand_Ground_06_47.obj");
-	texture = Texture::Get("data/biglib/WesternPack/texture.tga");
+	//mesh = Mesh::Get("data/biglib/WesternPack/Envyrontment/SM_Env_Sand_Ground_06_47.obj");
+	//texture = Texture::Get("data/biglib/WesternPack/texture.tga");
 	shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
 	
 	Scene::instance->addEntity(camera);
@@ -80,7 +80,7 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 
 	//player
 	Entity* player = new Player("data/biglib/WesternPack_renamed/All/Character_Badguy_01_10.obj", "data/biglib/WesternPack_renamed/texture.tga");
-	player->model.setTranslation(4.700, 1.125, 10.400);
+	player->model.setTranslation(4.700, 1.125, 7.400);
 	player->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
 	player->render_always = 1;
 	player->setType(3);
@@ -126,6 +126,12 @@ void Game::render(void)
 	Stage::current_stage->render(stages);
 
 	shader->disable();
+
+	/*
+	for (int i = 1; i < Scene::instance->entities.size(); i++) {
+		EntityMesh* a = (EntityMesh*)Scene::instance->entities[i];
+		a->mesh->renderBounding(a->model);
+	}*/
 
 	//swap between front buffer and back buffer
 	SDL_GL_SwapWindow(this->window);

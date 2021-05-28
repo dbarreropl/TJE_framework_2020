@@ -28,6 +28,10 @@ void Scene::addEntity(Entity* Entity){
 	}
 }
 
+void Scene::addBulletHole(Entity* Entity) {
+	Scene::instance->bullet_holes.push_back(Entity);
+}
+
 void Scene::loadScene() {
 	
 	//load file scene
