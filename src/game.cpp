@@ -79,7 +79,8 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	Scene::instance->addEntity(sky);
 
 	//player
-	Entity* player = new Player("data/biglib/WesternPack_renamed/All/Character_Badguy_01_10.obj", "data/biglib/WesternPack_renamed/texture.tga");
+	//Entity* player = new Player("data/biglib/WesternPack_renamed/All/Character_Badguy_01_10.obj", "data/biglib/WesternPack_renamed/texture.tga");
+	Entity* player = new Player("data/biglib/character.mesh", "data/biglib/WesternPack_renamed/texture.tga");
 	player->model.setTranslation(4.700, 1.125, 7.400);
 	player->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
 	player->render_always = 1;

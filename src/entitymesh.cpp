@@ -11,13 +11,15 @@ EntityMesh::EntityMesh(const char* mesh, const char* texture)
 }
 
 void EntityMesh::render() {
+
+	shader = Shader::current;
 	if (shader && this->visible==TRUE)
 	{
 		//get the last camera that was activated
 		//Camera* camera = Camera::current;
 		Camera* camera = (Camera*)Scene::instance->cameras[0];
 		//if the object is moving
-		box_world = transformBoundingBox(this->model, mesh->box); //...
+		//box_world = transformBoundingBox(this->model, mesh->box);
 		//if(camera->testBoxInFrustum(this->box_world.center, this->box_world.halfsize)){
 		if (this->render_always == TRUE || camera->testSphereInFrustum(this->position_world(), mesh->radius)) {
 			//enable shader
@@ -37,5 +39,4 @@ void EntityMesh::render() {
 			//shader->disable();
 		}
 	}
-
 }

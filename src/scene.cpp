@@ -62,9 +62,9 @@ void Scene::loadScene() {
 
 		//if (!data_spl[0].find("SM_Prop_Coffin_01")) {
 
-		entity->model.rotate(DEG2RAD * (std::stof(rot[0])), Vector3(1.0f, 0.0f, 0.0f)); //1 where rotation applies //(std::stof(rot[0])/4)
+		//entity->model.rotate(DEG2RAD * (std::stof(rot[2])), Vector3(0.0f, 0.0f, 1.0f)); //1 where rotation applies //(std::stof(rot[0])/4)
 		entity->model.rotate(DEG2RAD * (std::stof(rot[1])), Vector3(0.0f, 1.0f, 0.0f));
-		entity->model.rotate(DEG2RAD * (std::stof(rot[2])), Vector3(0.0f, 0.0f, 1.0f));
+		entity->model.rotate(DEG2RAD * (std::stof(rot[0])), Vector3(-1.0f, 0.0f, 0.0f));
 
 		//scale
 		std::vector <std::string> scl = split(data_spl[3], ',');
