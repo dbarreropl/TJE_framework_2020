@@ -26,7 +26,6 @@ void Player::render()
 				walk->assignTime(time_walk);
 
 			mesh->renderAnimated(GL_TRIANGLES, &walk->skeleton);
-			//mesh->render(GL_TRIANGLES);
 			//shader->disable();
 		}
 	}
@@ -54,7 +53,7 @@ void Player::updateCamera()
 	Vector3 forward = pitch.rotateVector(Vector3(0.0f, 0.0f, 1.0f));
 	forward = this->model.rotateVector(forward);
 
-	Vector3 eye = this->model * Vector3(0.0f, 1.5f, 0.5f); //z en 0.5
+	Vector3 eye = this->model * Vector3(0.0f, 1.5f, 0.5f);
 	Vector3 center = eye + forward;
 
 	Vector3 up = Vector3(0.0f,1.0f,0.0f);
@@ -76,14 +75,9 @@ bool Player::testCollision(EntityMesh* entity, Vector3 targetMove) {
 	Vector3 collnorm;
 	if (entity->mesh->testSphereCollision(entity->model, characterTargetCenter, 0.4, coll, collnorm)) {
 		Vector3 push_away = normalize(coll-characterTargetCenter)*Game::instance->elapsed_time;
-		this->targetPos = pos - push_away;
-		this->targetPos.y = pos.y;
 		this->targetMove = Vector3((-push_away.x), 0, (-push_away.z));
 		velocity = reflect(velocity, collnorm)*0.95;
 
-		std::cout << this->targetMove.x<< std::endl;
-		std::cout << this->targetMove.y << std::endl;
-		std::cout << this->targetMove.z << std::endl;
 		return TRUE;
 	}
 	else {
@@ -112,7 +106,6 @@ void Player::boundingSelected()
 
 void Player::shoot()
 {
-
 	isShooting = true;
 	//entities colision
 	std::vector <Entity*> entities;
@@ -135,7 +128,7 @@ void Player::shoot()
 		}
 	}
 
-	//entity mes a prop
+	//near entity
 	Vector3 pos = this->model.getTranslation();
 	Entity* entity = NULL;
 	Vector3 entity_col = Vector3(0,0,0);
@@ -164,7 +157,7 @@ void Player::shoot()
 		entity_sh->render_always = TRUE;
 		entity_sh->visible = TRUE;
 	
-		//hole una mica mes proper al player
+		//hole near player
 		if (pos.x > entity_col.x)
 			entity_col.x = entity_col.x + 0.01;
 		else

@@ -64,7 +64,6 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	Scene::instance = NULL;
 	new Scene();
 
-	//...addobjectinfront
 	//mesh = Mesh::Get("data/biglib/WesternPack/Envyrontment/SM_Env_Sand_Ground_06_47.obj");
 	//texture = Texture::Get("data/biglib/WesternPack/texture.tga");
 	shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
@@ -79,7 +78,6 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	Scene::instance->addEntity(sky);
 
 	//player
-	//Entity* player = new Player("data/biglib/WesternPack_renamed/All/Character_Badguy_01_10.obj", "data/biglib/WesternPack_renamed/texture.tga");
 	Entity* player = new Player("data/biglib/character.mesh", "data/biglib/WesternPack_renamed/texture.tga");
 	player->model.setTranslation(4.700, 1.125, 7.400);
 	player->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
@@ -90,16 +88,6 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	//cam to player pos
 	Player* player_s = (Player*)Scene::instance->players[0];
 	player_s->updateCamera();
-
-	/*
-	Entity* floor;
-	for (int i = 0; i < 10; i++) {
-		for (int j = 0; j < 10; j++) {
-			floor = new EntityMesh(mesh, texture, shader);
-			floor->model.setTranslation(i * mesh->box.halfsize.x * 1.8, 0.0f, j * mesh->box.halfsize.z * 1.8);
-			Scene::instance->addEntity(floor);
-		}
-	}*/
 
 	//hide the cursor
 	SDL_ShowCursor(!mouse_locked); //hide or show the mouse
@@ -128,12 +116,6 @@ void Game::render(void)
 
 	shader->disable();
 
-	/*
-	for (int i = 1; i < Scene::instance->entities.size(); i++) {
-		EntityMesh* a = (EntityMesh*)Scene::instance->entities[i];
-		a->mesh->renderBounding(a->model);
-	}*/
-
 	//swap between front buffer and back buffer
 	SDL_GL_SwapWindow(this->window);
 }
@@ -142,9 +124,6 @@ void Game::update(double seconds_elapsed)
 {
 
 	float speed = seconds_elapsed * mouse_speed; //the speed is defined by the seconds_elapsed so it goes constant
-
-	//example
-	//angle += (float)seconds_elapsed * 10.0f;
 
 	//change edit/play mode
 	Player* player = (Player*)Scene::instance->players[0];
@@ -235,4 +214,3 @@ void Game::onResize(int width, int height)
 	window_width = width;
 	window_height = height;
 }
-

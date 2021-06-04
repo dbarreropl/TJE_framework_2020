@@ -10,16 +10,15 @@ public:
 
 	Animation* walk;
 	Animation* shot;
-	bool isShooting = false;
-	bool isMoving = false;
 	float time_walk;
 
-	Vector3 targetMove;
-	Vector3 targetPos;
+	bool isShooting = false;
+	bool isMoving = false;
 	bool isColiding = true;
 
+	Vector3 targetMove;
+
 	Vector3 velocity = Vector3(5.0f, 5.0f, 5.0f);
-	int animLenght = 4;
 	float movementVelocity = 3.0f;
 	float yaw = 0.0f;
 	float pitch = 0.0f;

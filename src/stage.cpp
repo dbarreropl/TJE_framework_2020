@@ -141,7 +141,6 @@ void PlayStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
 		player->isMoving = FALSE;
 
 	player->targetMove = playerSpeed;
-	player->targetPos = player->model.getTranslation() - playerSpeed;
 
 	//player colision
 	for (int i = 1; i < Scene::instance->entities.size(); i++) {
