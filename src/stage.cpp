@@ -82,8 +82,9 @@ void PlayStage::render(std::vector<Stage*> stages) {
 
 	Scene::instance->players[0]->render(); //player
 
-	
-	player->time_walk = Game::instance->time;
+	for (int i = 0; i < Scene::instance->characters.size(); i++) { //enemies
+		Scene::instance->characters[i]->render();
+	}
 
 	//player shoot direction
 	float screen_x = Input::mouse_position.x + Input::mouse_delta.x;
@@ -102,8 +103,7 @@ void PlayStage::render(std::vector<Stage*> stages) {
 }
 
 void PlayStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
-	//update camara respecto player
-	
+
 	Camera* camera = (Camera*)Scene::instance->cameras[0];
 	Player* player = (Player*)Scene::instance->players[0];
 
@@ -118,6 +118,7 @@ void PlayStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
 	Vector3 playerFront = playerRot.rotateVector(Vector3(0.0f,0.0f,-1.0f));
 	Vector3 playerRight = playerRot.rotateVector(Vector3(1.0f, 0.0f, 0.0f));
 	Vector3 playerSpeed = Vector3(0,0,0);
+
 
 	Vector3 speed = player->velocity * seconds_elapsed;
 	
@@ -135,23 +136,53 @@ void PlayStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
 		playerSpeed = playerSpeed - (playerRight * speed);
 	}
 
-	if (playerSpeed.x != 0 || playerSpeed.y != 0 || playerSpeed.z != 0)
+	if (playerSpeed.x != 0 || playerSpeed.y != 0 || playerSpeed.z != 0) {
 		player->isMoving = TRUE;
-	else
+		player->time_walk = Game::instance->time;
+	}
+	else {
 		player->isMoving = FALSE;
+	}
 
 	player->targetMove = playerSpeed;
 
+	player->aux = false;
+	player->height_floor = -0.05;
+	
 	//player colision
 	for (int i = 1; i < Scene::instance->entities.size(); i++) {
 		EntityMesh* entity = (EntityMesh*)Scene::instance->entities[i];
-		if(entity->visible==TRUE)
+		if (entity->visible == TRUE)
 			if (player->testCollision(entity, player->targetMove))
 				player->onCollision(entity);
 	}
 	
-	player->movePlayer(player->targetMove);
+	//lanzar rayo de pies a abajo, si distancia es mas grande que 0.1 bajar -0.05, si es mas pequeño hacer push away
+	Vector3 pos = player->model.getTranslation(); //this->position_world()
+	Vector3 characterTargetCenter = pos + player->targetMove + Vector3(0.0f, 0.2f, 0.0f);
+	Vector3 dir = Vector3(0.0f, -5.0f, 0.0f);
+	float near_y = 10;
+	for (int i = 1; i < Scene::instance->entities.size(); i++) {
+		EntityMesh* entity = (EntityMesh*)Scene::instance->entities[i];
+		Vector3 col;
+		Vector3 normal;
+		if (entity->visible == TRUE)
+			if (entity->mesh->testRayCollision(entity->model, pos, dir, col, normal, 10)) {
+				float dist_obj = pos.y-(col.y + normal.y);
+				if (dist_obj < near_y)
+					near_y = dist_obj;
+			}
+	}
+	
+	//near_y = clamp(near_y,0,1);
+	if (near_y > player->height_floor && pos.y>0.1)
+			player->targetMove.y = -0.05;
+
+	//std::cout << near_y << std::endl;
+
 	player->model.rotate((player->yaw), Vector3(0.0f, -1.0f, 0.0f));
+	player->movePlayer(player->targetMove);
+
 
 	//shoot
 	if (Input::mouse_state & SDL_BUTTON_RIGHT) //is left button pressed?
@@ -159,9 +190,9 @@ void PlayStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
 		player->shoot();
 	}
 
-	if (Input::wasKeyPressed(SDL_SCANCODE_ESCAPE)) //if key ESC was pressed
+	if (Input::wasKeyPressed(SDL_SCANCODE_Y))
 	{
-		
+		player->aux = true;
 	}
 
 	//to read the gamepad state

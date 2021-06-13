@@ -14,7 +14,8 @@ public:
 		PREFAB,
 		CAMERA,
 		LIGHT,
-		PLAYER
+		PLAYER,
+		ENEMIE
 
 	};
 	eType type;

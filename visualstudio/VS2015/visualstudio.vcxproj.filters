@@ -67,6 +67,8 @@
     <ClCompile Include="..\..\src\entitymesh.cpp" />
     <ClCompile Include="..\..\src\stage.cpp" />
     <ClCompile Include="..\..\src\player.cpp" />
+    <ClCompile Include="..\..\src\pathfinders.cpp" />
+    <ClCompile Include="..\..\src\character.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\camera.h" />
@@ -131,6 +133,8 @@
     <ClInclude Include="..\..\src\entitymesh.h" />
     <ClInclude Include="..\..\src\stage.h" />
     <ClInclude Include="..\..\src\player.h" />
+    <ClInclude Include="..\..\src\pathfinders.h" />
+    <ClInclude Include="..\..\src\character.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="extra">

@@ -79,15 +79,49 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 
 	//player
 	Entity* player = new Player("data/biglib/character.mesh", "data/biglib/WesternPack_renamed/texture.tga");
-	player->model.setTranslation(4.700, 1.125, 7.400);
+	player->model.setTranslation(4.700, 0, 4.400);
 	player->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
-	player->render_always = 1;
-	player->setType(3);
 	Scene::instance->addEntity(player);
-
 	//cam to player pos
 	Player* player_s = (Player*)Scene::instance->players[0];
 	player_s->updateCamera();
+
+	//characters
+	Entity* Business_Man = new Character("data/biglib/Characters/Business_Man.mesh", "data/biglib/WesternPack_renamed/texture.tga", "data/biglib/old_man_idle.skanim");
+	Business_Man->model.setTranslation(4.700, 0, 4.400);
+	Business_Man->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
+	Scene::instance->addEntity(Business_Man);
+
+	Entity* CowBoy = new Character("data/biglib/Characters/CowBoy.mesh", "data/biglib/WesternPack_renamed/texture.tga", "data/biglib/arm_stretching.skanim");
+	CowBoy->model.setTranslation(2.700, 0, -5.400);
+	CowBoy->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
+	Scene::instance->addEntity(CowBoy);
+
+	Entity* CowGirl = new Character("data/biglib/Characters/CowGirl.mesh", "data/biglib/WesternPack_renamed/texture.tga", "data/biglib/briefcase_idle.skanim");
+	CowGirl->model.setTranslation(2.700, 0, -7.400);
+	CowGirl->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
+	Scene::instance->addEntity(CowGirl);
+
+	Entity* GunMan = new Character("data/biglib/Characters/GunMan.mesh", "data/biglib/WesternPack_renamed/texture.tga", "data/biglib/walk_in_circle.skanim");
+	GunMan->model.setTranslation(2.700, 0, -9.400);
+	GunMan->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
+	Scene::instance->addEntity(GunMan);
+
+	Entity* Sheriff = new Character("data/biglib/Characters/Sheriff.mesh", "data/biglib/WesternPack_renamed/texture.tga", "data/biglib/drunk_idle.skanim");
+	Sheriff->model.setTranslation(-2.700, 0, -9.400);
+	Sheriff->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
+	Scene::instance->addEntity(Sheriff);
+
+	Entity* Woman = new Character("data/biglib/Characters/Woman.mesh", "data/biglib/WesternPack_renamed/texture.tga", "data/biglib/breathing_idle.skanim");
+	Woman->model.setTranslation(2.700, 0, -11.400);
+	Woman->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
+	Scene::instance->addEntity(Woman);
+
+	Entity* WorkingGirl = new Character("data/biglib/Characters/WorkingGirl.mesh", "data/biglib/WesternPack_renamed/texture.tga", "data/biglib/jazz_dancing.skanim");
+	WorkingGirl->model.setTranslation(-1.700, 0, -12.400);
+	WorkingGirl->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
+	Scene::instance->addEntity(WorkingGirl);
+
 
 	//hide the cursor
 	SDL_ShowCursor(!mouse_locked); //hide or show the mouse

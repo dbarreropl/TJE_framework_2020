@@ -6,6 +6,7 @@
 #include "entitymesh.h"
 #include "camera.h"
 #include "player.h"
+#include "character.h"
 
 class Scene
 {
@@ -14,6 +15,7 @@ public:
 	static Scene* instance;
 	std::vector <Entity*> entities;
 	std::vector <Entity*> players;
+	std::vector <Entity*> characters;
 	std::vector <Entity*> cameras;
 	std::vector <Entity*> lights;
 

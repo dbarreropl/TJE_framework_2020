@@ -5,29 +5,47 @@
 
 void Player::render()
 {
+	Camera* camera = (Camera*)Scene::instance->cameras[0];
+	gun.render();
+
 	//shader = Shader::current;
 	shader->disable();
 	shader->enable();
 	if (shader && this->visible == TRUE)
 	{
-		Camera* camera = (Camera*)Scene::instance->cameras[0];
-
-		if (this->render_always == TRUE || camera->testSphereInFrustum(this->position_world(), mesh->radius)) {
-			float time = Game::instance->time;
-			//upload uniforms
-			//shader->enable();
-			shader->setUniform("u_color", Vector4(1, 1, 1, 1));
-			shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
-			shader->setUniform("u_texture", texture, 0);
-			shader->setUniform("u_model", this->model);
-			shader->setUniform("u_time", time_walk);
-			//do the draw call
-			if (isMoving)
-				walk->assignTime(time_walk);
-
-			mesh->renderAnimated(GL_TRIANGLES, &walk->skeleton);
-			//shader->disable();
+		Skeleton result=shot->skeleton;
+		if (isShooting) {
+			shot->assignTime(Game::instance->time - time_shot);
+			if ((Game::instance->time - time_shot) > shot->duration) {
+				isShooting = false;
+				shot->assignTime(0);
+			}
 		}
+		if (isMoving) {
+			walk->assignTime(time_walk);
+		}
+		blendSkeleton(&result, &walk->skeleton, 0.5f, &result);
+		
+		float time = Game::instance->time;
+		//upload uniforms
+		//shader->enable();
+		shader->setUniform("u_color", Vector4(1, 1, 1, 1));
+		shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
+		shader->setUniform("u_texture", texture, 0);
+		shader->setUniform("u_model", this->model);
+		shader->setUniform("u_time", time_walk);
+		//do the draw call
+
+		Matrix44& Head = result.getBoneMatrix("mixamorig_Head");
+		Head.scale(0,0,0);
+		Matrix44& LeftArm = result.getBoneMatrix("mixamorig_LeftArm");
+		LeftArm.scale(0,0,0);
+			
+		Matrix44& RightArm = result.getBoneMatrix("mixamorig_RightArm");
+		//RightArm.scale(0, 0, 0);
+
+		mesh->renderAnimated(GL_TRIANGLES, &result);
+		//shader->disable();
 	}
 }
 
@@ -38,22 +56,24 @@ void Player::movePlayer(Vector3 move) {
 	else
 		this->model.translate(move.x, move.y, move.z);
 
-	
+	gun.model = model;
+	gun.model.translate(-0.25,1.2,0.4);
+
 }
 
 void Player::updateCamera()
 {
 	Camera* cam = (Camera*)Scene::instance->cameras[0];
 	Vector3 player_pos = this->model.getTranslation();
-	//cam->lookAt(Vector3(player_pos.x+0.2, player_pos.y + 2.5, player_pos.z + 2.5), Vector3(player_pos.x + 0.3, player_pos.y + 1.6, player_pos.z - 2.5), Vector3(0.f, 1.f, 0.f));
-
+	
 	Matrix44 pitch;
 	//this->model.rotate(this->pitch * DEG2RAD, Vector3(1.0f, 0.0f, 0.0f));
 	pitch.rotate(this->pitch , Vector3(1.0f,0.0f,0.0f));
 	Vector3 forward = pitch.rotateVector(Vector3(0.0f, 0.0f, 1.0f));
 	forward = this->model.rotateVector(forward);
+	//forward.x = forward.x - 0.1;
 
-	Vector3 eye = this->model * Vector3(0.0f, 1.5f, 0.5f);
+	Vector3 eye = this->model * Vector3(-0.2f, 1.4f, 0.05f);
 	Vector3 center = eye + forward;
 
 	Vector3 up = Vector3(0.0f,1.0f,0.0f);
@@ -70,14 +90,17 @@ void Player::onCollision(Entity* entity)
 
 bool Player::testCollision(EntityMesh* entity, Vector3 targetMove) {
 	Vector3 pos = this->model.getTranslation(); //this->position_world()
-	Vector3 characterTargetCenter = pos + this->targetMove + Vector3(0.0f, 1.0f, 0.0f);
+	Vector3 characterTargetCenter = pos + targetMove + Vector3(0.0f, 0.2f, 0.0f);
 	Vector3 coll;
 	Vector3 collnorm;
-	if (entity->mesh->testSphereCollision(entity->model, characterTargetCenter, 0.4, coll, collnorm)) {
-		Vector3 push_away = normalize(coll-characterTargetCenter)*Game::instance->elapsed_time;
-		this->targetMove = Vector3((-push_away.x), 0, (-push_away.z));
-		velocity = reflect(velocity, collnorm)*0.95;
 
+	if (entity->mesh->testSphereCollision(entity->model, characterTargetCenter, 0.4, coll, collnorm)) {
+		Vector3 push_away = normalize(coll - characterTargetCenter) *Game::instance->elapsed_time;
+		this->targetMove = Vector3((-push_away.x), -(push_away.y*5), (-push_away.z));
+		velocity = reflect(velocity, collnorm)*0.95;
+		//this->height_floor = characterTargetCenter.y;
+		aux = true;
+		this->height_floor = (push_away.y*5);
 		return TRUE;
 	}
 	else {
@@ -106,6 +129,7 @@ void Player::boundingSelected()
 
 void Player::shoot()
 {
+	time_shot = Game::instance->time;
 	isShooting = true;
 	//entities colision
 	std::vector <Entity*> entities;
