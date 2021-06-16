@@ -1,5 +1,6 @@
 #include "stage.h"
 #include "input.h"
+#include "audio.h"
 
 Stage* Stage::current_stage = NULL;
 
@@ -16,7 +17,9 @@ void IntroStage::render(std::vector<Stage*> stages) {
 
 void IntroStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
 	
+	HCHANNEL l = Audio::Play("data/audio/music.wav", 2000, true);
 	Scene::instance->loadScene();
+	Audio::Stop(l);
 	this->current_stage = stages[2];
 	
 }
@@ -190,9 +193,29 @@ void PlayStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
 		player->shoot();
 	}
 
+	if (Input::wasKeyPressed(SDL_SCANCODE_T))
+	{
+		player->x += 0.01;
+	}
 	if (Input::wasKeyPressed(SDL_SCANCODE_Y))
 	{
-		player->aux = true;
+		player->x -= 0.01;
+	}
+	if (Input::wasKeyPressed(SDL_SCANCODE_U))
+	{
+		player->y += 0.01;
+	}
+	if (Input::wasKeyPressed(SDL_SCANCODE_I))
+	{
+		player->y -= 0.01;
+	}
+	if (Input::wasKeyPressed(SDL_SCANCODE_O))
+	{
+		player->z += 0.01;
+	}
+	if (Input::wasKeyPressed(SDL_SCANCODE_P))
+	{
+		player->z -= 0.01;
 	}
 
 	//to read the gamepad state

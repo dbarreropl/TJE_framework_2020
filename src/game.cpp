@@ -8,6 +8,7 @@
 #include "animation.h"
 #include "stage.h"
 #include "scene.h"
+#include "audio.h"
 
 #include <cmath>
 
@@ -120,9 +121,17 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	Entity* WorkingGirl = new Character("data/biglib/Characters/WorkingGirl.mesh", "data/biglib/WesternPack_renamed/texture.tga", "data/biglib/jazz_dancing.skanim");
 	WorkingGirl->model.setTranslation(-1.700, 0, -12.400);
 	WorkingGirl->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
-	Scene::instance->addEntity(WorkingGirl);
+	Scene::instance->addEntity(WorkingGirl);	
+	
+	//Inicializamos BASS al arrancar el juego (id_del_device, muestras por segundo, ...)
+	assert((BASS_Init(-1, 44100, 0, 0, NULL) == true) && "Error opening sound card");
 
-
+	//Audio* audio = Audio::Get("data/audio/a.wav",true);
+	//audio->play(1);
+	//HCHANNEL a = Audio::Play("data/audio/music.wav",2000,true);
+	//Audio::Stop(a);
+	//HCHANNEL b = Audio::GetChannel("data/audio/music.wav");
+	//Audio::Stop(b);
 	//hide the cursor
 	SDL_ShowCursor(!mouse_locked); //hide or show the mouse
 }

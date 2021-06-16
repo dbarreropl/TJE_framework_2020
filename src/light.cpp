@@ -13,4 +13,3 @@ Light::Light(float light_type, float intensity, Vector3 color, Vector3 position,
 
 }
 
-

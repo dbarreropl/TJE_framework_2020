@@ -7,7 +7,7 @@
 class Player : public EntityMesh
 {
 public:
-
+	float x=-0.03, y=0.01, z=-0.2;
 	Animation* walk;
 	Animation* shot;
 	float time_walk;

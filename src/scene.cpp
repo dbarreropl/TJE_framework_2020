@@ -76,7 +76,6 @@ void Scene::loadScene() {
 		//type
 		entity->setType(0);
 		
-
 		Scene::instance->addEntity(entity);
 	}
 	this->loaded = TRUE;

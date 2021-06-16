@@ -6,17 +6,16 @@
 void Player::render()
 {
 	Camera* camera = (Camera*)Scene::instance->cameras[0];
-	gun.render();
+	float time = Game::instance->time;
 
-	//shader = Shader::current;
-	shader->disable();
-	shader->enable();
 	if (shader && this->visible == TRUE)
 	{
 		Skeleton result=shot->skeleton;
+		shot->assignTime(0);
+		walk->assignTime(time_walk);
 		if (isShooting) {
-			shot->assignTime(Game::instance->time - time_shot);
-			if ((Game::instance->time - time_shot) > shot->duration) {
+			shot->assignTime(time - time_shot);
+			if ((time - time_shot) > shot->duration) {
 				isShooting = false;
 				shot->assignTime(0);
 			}
@@ -26,9 +25,24 @@ void Player::render()
 		}
 		blendSkeleton(&result, &walk->skeleton, 0.5f, &result);
 		
-		float time = Game::instance->time;
+		//gun
+		Matrix44& RightArm = result.getBoneMatrix("mixamorig_RightArm");
+		//RightArm.rotate(pitch, Vector3(1.75f, -0.5f, 1.0f));
+
+		Matrix44& RightHand = result.getBoneMatrix("mixamorig_RightHand",false);
+		gun.model = model;
+		gun.model.translate(-0.03, 0.01, -0.2);
+		gun.model = RightHand  * gun.model;
+		gun.model.rotate(70 * DEG2RAD, Vector3(0, 0, 1));
+		gun.model.rotate(55 * DEG2RAD, Vector3(0, 1, 0));
+		//gun.model.rotate(time * 100 * DEG2RAD, Vector3(1, 0, 0));
+		gun.render();
+
+		//shader = Shader::current;
+		shader->disable();
+		shader->enable();
+
 		//upload uniforms
-		//shader->enable();
 		shader->setUniform("u_color", Vector4(1, 1, 1, 1));
 		shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
 		shader->setUniform("u_texture", texture, 0);
@@ -40,9 +54,6 @@ void Player::render()
 		Head.scale(0,0,0);
 		Matrix44& LeftArm = result.getBoneMatrix("mixamorig_LeftArm");
 		LeftArm.scale(0,0,0);
-			
-		Matrix44& RightArm = result.getBoneMatrix("mixamorig_RightArm");
-		//RightArm.scale(0, 0, 0);
 
 		mesh->renderAnimated(GL_TRIANGLES, &result);
 		//shader->disable();
@@ -55,9 +66,6 @@ void Player::movePlayer(Vector3 move) {
 		this->model.translateGlobal(move.x, move.y, move.z);
 	else
 		this->model.translate(move.x, move.y, move.z);
-
-	gun.model = model;
-	gun.model.translate(-0.25,1.2,0.4);
 
 }
 
@@ -73,7 +81,7 @@ void Player::updateCamera()
 	forward = this->model.rotateVector(forward);
 	//forward.x = forward.x - 0.1;
 
-	Vector3 eye = this->model * Vector3(-0.2f, 1.4f, 0.05f);
+	Vector3 eye = this->model * Vector3(-0.1f, 1.4f, 0.15f);
 	Vector3 center = eye + forward;
 
 	Vector3 up = Vector3(0.0f,1.0f,0.0f);
