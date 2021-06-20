@@ -11,6 +11,7 @@ public:
 	static std::map<std::string, Audio*> sLoadedAudios; //para nuestro manager
 
 	HSAMPLE sample; //aqui guardamos el handler del sample que retorna BASS_SampleLoad
+	HCHANNEL channel;
 	float volume;
 	bool loop;
 

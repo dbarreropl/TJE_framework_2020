@@ -7,6 +7,7 @@
 #include "camera.h"
 #include "player.h"
 #include "character.h"
+#include "gui.h"
 
 class Scene
 {
@@ -18,6 +19,7 @@ public:
 	std::vector <Entity*> characters;
 	std::vector <Entity*> cameras;
 	std::vector <Entity*> lights;
+	std::vector <Entity*> guis;
 
 	std::vector <Entity*> bullet_holes;
 	

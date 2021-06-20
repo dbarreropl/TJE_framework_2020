@@ -8,7 +8,6 @@
 #include "animation.h"
 #include "stage.h"
 #include "scene.h"
-#include "audio.h"
 
 #include <cmath>
 
@@ -57,7 +56,7 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	stages.push_back(new IntroStage());
 	stages.push_back(new MenuStage());
 	stages.push_back(new PlayStage());
-	stages.push_back(new TutoStage());
+	stages.push_back(new MainStage());
 	stages.push_back(new EndStage());
 	Stage::current_stage = stages[0]; //Intro Stage at start
 
@@ -84,8 +83,8 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	player->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
 	Scene::instance->addEntity(player);
 	//cam to player pos
-	Player* player_s = (Player*)Scene::instance->players[0];
-	player_s->updateCamera();
+	//Player* player_s = (Player*)Scene::instance->players[0];
+	//player_s->updateCamera();
 
 	//characters
 	Entity* Business_Man = new Character("data/biglib/Characters/Business_Man.mesh", "data/biglib/WesternPack_renamed/texture.tga", "data/biglib/old_man_idle.skanim");
@@ -123,15 +122,28 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	WorkingGirl->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
 	Scene::instance->addEntity(WorkingGirl);	
 	
+	//Gui
+	Entity* title = new Gui("data/gui/title.png",false);
+	Scene::instance->addEntity(title);
+
+	Entity* title2 = new Gui("data/gui/title2.png", false);
+	Scene::instance->addEntity(title2);
+
+	Entity* icon = new Gui("data/gui/paper.png",true);
+	Scene::instance->addEntity(icon);
+
+	Entity* resume = new Gui("data/gui/resume.png", false);
+	Scene::instance->addEntity(resume);
+
+	Entity* exit = new Gui("data/gui/exit.png", false);
+	Scene::instance->addEntity(exit);
+
+	Entity* loading = new Gui("data/gui/loading2.png", false);
+	Scene::instance->addEntity(loading);
+
 	//Inicializamos BASS al arrancar el juego (id_del_device, muestras por segundo, ...)
 	assert((BASS_Init(-1, 44100, 0, 0, NULL) == true) && "Error opening sound card");
 
-	//Audio* audio = Audio::Get("data/audio/a.wav",true);
-	//audio->play(1);
-	//HCHANNEL a = Audio::Play("data/audio/music.wav",2000,true);
-	//Audio::Stop(a);
-	//HCHANNEL b = Audio::GetChannel("data/audio/music.wav");
-	//Audio::Stop(b);
 	//hide the cursor
 	SDL_ShowCursor(!mouse_locked); //hide or show the mouse
 }
@@ -212,7 +224,7 @@ void Game::onKeyDown( SDL_KeyboardEvent event )
 {
 	switch(event.keysym.sym)
 	{
-		case SDLK_ESCAPE: must_exit = true; break; //ESC key, kill the app
+		//case SDLK_ESCAPE: must_exit = true; break; //ESC key, kill the app
 		case SDLK_F1: Shader::ReloadAll(); break; 
 	}
 }

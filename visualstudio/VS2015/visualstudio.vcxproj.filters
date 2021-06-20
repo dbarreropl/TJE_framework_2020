@@ -70,6 +70,7 @@
     <ClCompile Include="..\..\src\pathfinders.cpp" />
     <ClCompile Include="..\..\src\character.cpp" />
     <ClCompile Include="..\..\src\audio.cpp" />
+    <ClCompile Include="..\..\src\gui.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\camera.h" />
@@ -138,6 +139,7 @@
     <ClInclude Include="..\..\src\character.h" />
     <ClInclude Include="..\..\src\bass.h" />
     <ClInclude Include="..\..\src\audio.h" />
+    <ClInclude Include="..\..\src\gui.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="extra">

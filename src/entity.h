@@ -15,8 +15,8 @@ public:
 		CAMERA,
 		LIGHT,
 		PLAYER,
-		ENEMIE
-
+		ENEMIE,
+		GUI
 	};
 	eType type;
 

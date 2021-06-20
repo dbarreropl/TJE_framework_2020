@@ -11,6 +11,7 @@ void Player::render()
 	if (shader && this->visible == TRUE)
 	{
 		Skeleton result=shot->skeleton;
+		Skeleton result2;
 		shot->assignTime(0);
 		walk->assignTime(time_walk);
 		if (isShooting) {
@@ -23,16 +24,23 @@ void Player::render()
 		if (isMoving) {
 			walk->assignTime(time_walk);
 		}
+		walk->assignTime(0);
+
 		blendSkeleton(&result, &walk->skeleton, 0.5f, &result);
-		
+		blendSkeleton(&walk->skeleton, &shot->skeleton, 0.5f, &result2);
+
+		//result.assignLayer(result.getBone("mixamorig_RightArm"), RIGHT_ARM);
+		//walk->assignTime(0, RIGHT_ARM);
+
 		//gun
 		Matrix44& RightArm = result.getBoneMatrix("mixamorig_RightArm");
 		//RightArm.rotate(pitch, Vector3(1.75f, -0.5f, 1.0f));
 
-		Matrix44& RightHand = result.getBoneMatrix("mixamorig_RightHand",false);
+		Matrix44& RightHand = result.getBoneMatrix("mixamorig_RightHand", false);
+		Matrix44& RightHand2 = result2.getBoneMatrix("mixamorig_RightHand", false);
 		gun.model = model;
 		gun.model.translate(-0.03, 0.01, -0.2);
-		gun.model = RightHand  * gun.model;
+		gun.model = RightHand * gun.model;
 		gun.model.rotate(70 * DEG2RAD, Vector3(0, 0, 1));
 		gun.model.rotate(55 * DEG2RAD, Vector3(0, 1, 0));
 		//gun.model.rotate(time * 100 * DEG2RAD, Vector3(1, 0, 0));

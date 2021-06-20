@@ -18,6 +18,7 @@ public:
 	bool isMoving = false;
 	bool isColiding = true;
 	float height_floor=0.1f;
+	bool canShoot = true;
 	Vector3 targetMove;
 
 	Vector3 velocity = Vector3(5.0f, 5.0f, 5.0f);
@@ -30,7 +31,7 @@ public:
 	
 		this->render_always = 1;
 		this->setType(3);
-		gun = EntityMesh("data/biglib/WesternPack_renamed/All/SM_Wep_Revolver_01.obj", texture);
+		gun = EntityMesh("data/biglib/WesternPack_renamed/All/revolver_01.obj", texture);
 		Vector3 pos = Vector3(4.700, 0, 4.400);
 		gun.model.setTranslation(pos.x,pos.y+1.5,pos.z+0.9);
 		gun.model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));

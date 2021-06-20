@@ -3,6 +3,7 @@
 #include "framework.h"
 #include "game.h"
 #include "scene.h"
+#include "audio.h"
 
 class Stage
 {
@@ -14,7 +15,7 @@ public:
 		IntroStage,
 		MenuStage,
 		PlayStage,
-		TutoStage,
+		MainStage,
 		EndStage
 	};
 
@@ -38,12 +39,13 @@ public:
 	int getStage() { return (int)actual_stage; };
 };
 
-class TutoStage : public Stage {
+class MainStage : public Stage {
 public:
 	Image image_tuto;
-
+	bool music_playing=false;
+	float camera_move = 0;
 	STAGE actual_stage = (STAGE)3;
-	TutoStage() {};
+	MainStage() {};
 	void render(std::vector<Stage*> stages);
 	void update(double seconds_elapsed, std::vector<Stage*> stages);
 	int getStage() { return (int)actual_stage; };
@@ -70,6 +72,8 @@ public:
 
 	STAGE actual_stage = (STAGE)2;
 	int level=1;
+	bool music_playing = false;
+	float wait=0;
 
 	void render(std::vector<Stage*> stages);
 	void update(double seconds_elapsed, std::vector<Stage*> stages);

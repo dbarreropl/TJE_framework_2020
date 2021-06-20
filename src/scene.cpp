@@ -26,6 +26,9 @@ void Scene::addEntity(Entity* Entity){
 	else if (Entity->type == 4) {
 		Scene::instance->characters.push_back(Entity);
 	}
+	else if (Entity->type == 5) {
+		Scene::instance->guis.push_back(Entity);
+	}
 	else{
 		Scene::instance->entities.push_back(Entity);
 	}
