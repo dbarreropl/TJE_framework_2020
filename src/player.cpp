@@ -2,6 +2,7 @@
 #include "scene.h"
 #include "game.h"
 #include "input.h"
+#include "audio.h"
 
 void Player::render()
 {
@@ -12,6 +13,21 @@ void Player::render()
 	{
 		Skeleton result=shot->skeleton;
 		Skeleton result2;
+
+		if (isReloading) {
+			reload->assignTime(time - time_reload);
+			blendSkeleton(&result, &reload->skeleton, 1.0f, &result, LEFT_ARM);
+			if ((time - time_reload) > reload->duration) {
+				isReloading = false;
+				bullets = 6;
+				reload->assignTime(0);
+			}
+		}
+		else {
+			reload->assignTime(0);
+			blendSkeleton(&result, &reload->skeleton, 1.0f, &result, LEFT_ARM);
+		}
+
 		shot->assignTime(0);
 		walk->assignTime(time_walk);
 		if (isShooting) {
@@ -24,12 +40,9 @@ void Player::render()
 		if (isMoving) {
 			walk->assignTime(time_walk);
 		}
-		walk->assignTime(0);
-
+		walk->assignTime(0);;
 		blendSkeleton(&result, &walk->skeleton, 0.5f, &result);
 		blendSkeleton(&walk->skeleton, &shot->skeleton, 0.5f, &result2);
-
-		//result.assignLayer(result.getBone("mixamorig_RightArm"), RIGHT_ARM);
 		//walk->assignTime(0, RIGHT_ARM);
 
 		//gun
@@ -61,8 +74,12 @@ void Player::render()
 		Matrix44& Head = result.getBoneMatrix("mixamorig_Head");
 		Head.scale(0,0,0);
 		Matrix44& LeftArm = result.getBoneMatrix("mixamorig_LeftArm");
-		LeftArm.scale(0,0,0);
 
+		LeftArm.translate(-0.1,0.04,0.25);
+		LeftArm.rotate(-0.85,Vector3(1,0,0));
+		LeftArm.rotate(0.65, Vector3(0, 1, 0));
+		//LeftArm.rotate(z, Vector3(1, 0, 1));
+	
 		mesh->renderAnimated(GL_TRIANGLES, &result);
 		//shader->disable();
 	}
@@ -125,8 +142,12 @@ bool Player::testCollision(EntityMesh* entity, Vector3 targetMove) {
 	}
 }
 
-void Player::boundingSelected()
+void Player::pickUp()
 {
+	Player* player = (Player*)Scene::instance->players[0];
+	player->nearObject = false;
+	float width = Game::instance->window_width;
+	float height = Game::instance->window_height;
 	Camera* camera = (Camera*)Scene::instance->cameras[0];
 	float screen_x = Input::mouse_position.x + Input::mouse_delta.x;
 	float screen_y = Input::mouse_position.y + Input::mouse_delta.y;
@@ -134,11 +155,20 @@ void Player::boundingSelected()
 	Vector3 dir = camera->getRayDirection(screen_x, screen_y, Game::instance->window_width, Game::instance->window_height);
 	for (int i = 0; i < Scene::instance->entities.size(); i++) {
 		EntityMesh* current = (EntityMesh*)Scene::instance->entities[i];
-		Vector3 col;
-		Vector3 normal;
-		if (current->mesh->testRayCollision(current->model, origin, dir, col, normal, 10)) {
-			current->mesh->renderBounding(current->model);
-			//current->visible = FALSE;
+		if (current->can_pickUp) {
+			Vector3 col;
+			Vector3 normal;
+			if (current->mesh->testRayCollision(current->model, origin, dir, col, normal, 2)) {
+				//current->mesh->renderBounding(current->model);
+				if (current->visible == TRUE) {
+					player->nearObject = true;
+					if (Input::wasKeyPressed(SDL_SCANCODE_E)) {
+						Audio::Play("data/audio/pick_up.wav", 2000, false);
+						current->visible = FALSE;
+						break;
+					}
+				}
+			}
 		}
 	}
 }
@@ -147,6 +177,9 @@ void Player::shoot()
 {
 	time_shot = Game::instance->time;
 	isShooting = true;
+	if(bullets>0)
+		bullets -= 1;
+
 	//entities colision
 	std::vector <Entity*> entities;
 	std::vector <Vector3> collisions;
@@ -154,7 +187,6 @@ void Player::shoot()
 	Camera* camera = (Camera*)Scene::instance->cameras[0];
 	float screen_x = Input::mouse_position.x + Input::mouse_delta.x;
 	float screen_y = Input::mouse_position.y + Input::mouse_delta.y;
-	drawText(screen_x, screen_y, ".", Vector3(1, 1, 1), 4);
 	Vector3 origin = camera->eye;
 	Vector3 dir = camera->getRayDirection(screen_x, screen_y, Game::instance->window_width, Game::instance->window_height);
 	for (int i = 0; i < Scene::instance->entities.size(); i++) {
@@ -167,6 +199,19 @@ void Player::shoot()
 			normals.push_back(normal);
 		}
 	}
+
+	//character colision
+	for (int i = 0; i < Scene::instance->characters.size(); i++) {
+		EntityMesh* current = (EntityMesh*)Scene::instance->characters[i];
+		Vector3 col;
+		Vector3 normal;
+		if (current->mesh->testRayCollision(current->model, origin, dir, col, normal, 10)) {
+			entities.push_back(current);
+			collisions.push_back(col);
+			normals.push_back(normal);
+		}
+	}
+
 
 	//near entity
 	Vector3 pos = this->model.getTranslation();
@@ -184,9 +229,13 @@ void Player::shoot()
 		}
 	}
 
+	if (entity && entity->type == 4 && entity->name == "BusinessMan")
+		won = true;
+	else if (entity && entity->type == 4)
+		game_over = true;
+
 	//create bullet hole
 	if (entity) {
-		//entity->visible = FALSE;
 		Mesh* mesh = Mesh::Get("data/bullet.obj");
 		Texture* texture = Texture::Get("data/bullet2.png");
 		Shader* shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
@@ -194,7 +243,6 @@ void Player::shoot()
 		entity_sh->mesh = mesh;
 		entity_sh->texture = texture;
 		entity_sh->shader = shader;
-		entity_sh->render_always = TRUE;
 		entity_sh->visible = TRUE;
 	
 		//hole near player

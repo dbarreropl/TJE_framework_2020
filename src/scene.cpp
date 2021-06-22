@@ -78,8 +78,12 @@ void Scene::loadScene() {
 
 		//type
 		entity->setType(0);
-		
+
+		//name
+		entity->name = data_spl[0].c_str();
 		Scene::instance->addEntity(entity);
+		if (!data_spl[0].find("SM_Prop_Poker_Chip"))
+			entity->can_pickUp = true;
 	}
 	this->loaded = TRUE;
 

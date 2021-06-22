@@ -7,8 +7,9 @@ class Entity
 public:
 	unsigned int id;
 	Matrix44 model;
-	
+	std::string name;
 	bool visible;
+	bool can_pickUp=false;
 	bool render_always=0;
 	enum eType {
 		PREFAB,

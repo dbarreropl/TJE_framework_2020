@@ -74,6 +74,7 @@ public:
 	int level=1;
 	bool music_playing = false;
 	float wait=0;
+	bool aux=false;
 
 	void render(std::vector<Stage*> stages);
 	void update(double seconds_elapsed, std::vector<Stage*> stages);

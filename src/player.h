@@ -7,19 +7,32 @@
 class Player : public EntityMesh
 {
 public:
-	float x=-0.03, y=0.01, z=-0.2;
+	float x=0, y=0, z=0;
+	Vector3 initialPos;
+	Vector3 targetMove;
+
 	Animation* walk;
 	Animation* shot;
+	Animation* reload;
 	float time_walk;
 	float time_shot;
+	float time_reload;
+	float bullets = 6;
+
+	float height_floor=0.1f;
 	bool aux;
 	EntityMesh gun;
 	bool isShooting = false;
+	bool isReloading = false;
 	bool isMoving = false;
 	bool isColiding = true;
-	float height_floor=0.1f;
+	bool isTalking = false;
+
 	bool canShoot = true;
-	Vector3 targetMove;
+	bool nearCharacter = false;
+	bool nearObject = false;
+	bool game_over=false;
+	bool won=false;
 
 	Vector3 velocity = Vector3(5.0f, 5.0f, 5.0f);
 	float movementVelocity = 3.0f;
@@ -36,6 +49,7 @@ public:
 		gun.model.setTranslation(pos.x,pos.y+1.5,pos.z+0.9);
 		gun.model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
 		shot = Animation::Get("data/biglib/shooting.skanim");
+		reload = Animation::Get("data/biglib/reload.skanim");
 		walk = Animation::Get("data/biglib/walking.skanim");
 		shader = Shader::Get("data/shaders/skinning.vs", "data/shaders/texture.fs");
 	}
@@ -46,7 +60,7 @@ public:
 	void onCollision(Entity* entity);
 	bool testCollision(EntityMesh* entity, Vector3 targetMove);
 
-	void boundingSelected();
+	void pickUp();
 
 	void shoot();
 };

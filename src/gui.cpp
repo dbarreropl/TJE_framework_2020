@@ -15,6 +15,10 @@ Gui::Gui(const char* texture, bool invert)
 }
 
 void Gui::render(float x, float y,float w,float h, bool can_hover) {
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	shader->enable();
 	//shader = Shader::current;
@@ -52,4 +56,7 @@ void Gui::render(float x, float y,float w,float h, bool can_hover) {
 		
 		//shader->disable();
 	}
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glDisable(GL_BLEND);
 }

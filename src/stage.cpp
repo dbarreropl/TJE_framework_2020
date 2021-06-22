@@ -34,22 +34,14 @@ void MainStage::render(std::vector<Stage*> stages) {
 		Scene::instance->entities[i]->render();
 	}	
 
-	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_CULL_FACE);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	Gui* title = (Gui*)Scene::instance->guis[0];
 	float width = Game::instance->window_width;
 	float height = Game::instance->window_height;
+	Gui* title = (Gui*)Scene::instance->guis[0];
 	title->render(width / 2, height / 2.8, width * 0.7, height * 0.7);
-	Gui* title2 = (Gui*)Scene::instance->guis[1];
-	title2->render(width / 2, height/1.2, width * 0.6, height * 0.6);
-
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glDisable(GL_BLEND);
-
+	Gui* main_play = (Gui*)Scene::instance->guis[1];
+	main_play->render(width *0.65, height *0.8, width * 0.18, height * 0.14, true);
+	Gui* main_exit = (Gui*)Scene::instance->guis[8];
+	main_exit->render(width * 0.35, height * 0.8, width * 0.18, height * 0.14, true);
 }
 
 void MainStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
@@ -57,6 +49,11 @@ void MainStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
 		Audio::Play("data/audio/music.wav", 2000, true);
 		music_playing = true;
 	}
+
+	Player* player = (Player*)Scene::instance->players[0];
+	player->model.setTranslation(player->initialPos.x, player->initialPos.y, player->initialPos.z);
+	player->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
+
 	Camera* camera = (Camera*)Scene::instance->cameras[0];
 	if(camera->eye.z > -40)
 		camera_move-=0.002;
@@ -66,18 +63,24 @@ void MainStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
 	Vector3 up = Vector3(0.0f, 1.0f, 0.0f);
 	camera->lookAt(eye, center, up);
 
-	if (Input::wasKeyPressed(SDL_SCANCODE_SPACE)) //if key space
-	{
-		HCHANNEL music = Audio::GetChannel("data/audio/music.wav");
-		Audio::Stop(music);
-		camera_move = 0;
-		music_playing = false;
-		this->current_stage = stages[2];
-	}
-
 	if (Input::wasKeyPressed(SDL_SCANCODE_ESCAPE)) //if key space
 	{
 		Game::instance->must_exit = true;
+	}
+
+	Gui* main_play = (Gui*)Scene::instance->guis[1];
+	Gui* main_exit = (Gui*)Scene::instance->guis[8];
+	if ((Input::mouse_state & SDL_BUTTON_RIGHT)) //Exit
+	{
+		if(main_exit->hover)
+			Game::instance->must_exit = true;
+		else if(main_play->hover){
+			HCHANNEL music = Audio::GetChannel("data/audio/music.wav");
+			Audio::Stop(music);
+			camera_move = 0;
+			music_playing = false;
+			this->current_stage = stages[2];
+		}
 	}
 
 	SDL_ShowCursor(true);
@@ -88,24 +91,15 @@ void MenuStage::render(std::vector<Stage*> stages) {
 	stages[2]->render(stages);
 	//drawText(100, 450, "MENU", Vector3(1, 1, 1), 4);
 
-	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_CULL_FACE);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 	float width = Game::instance->window_width;
 	float height = Game::instance->window_height;
 	Gui* icon = (Gui*)Scene::instance->guis[2];
-	icon->render(width /2, height /2, width*0.5, height*0.7);
+	icon->render(width /2, height /2, width*0.45, height*0.6);
 	Gui* resume = (Gui*)Scene::instance->guis[3];
 	//resume->render(width / 2, height / 2.8, width, height, true);
-	resume->render(width / 2, height / 2.8, width/3.5, height/7, true);
+	resume->render(width / 2, height / 2.7, width/3.5, height/7, true);
 	Gui* exit = (Gui*)Scene::instance->guis[4];
 	exit->render(width / 2, height / 1.7, width/3.5, height/7, true);
-
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glDisable(GL_BLEND);
 
 }
 
@@ -127,10 +121,6 @@ void MenuStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
 
 	if ((Input::mouse_state & SDL_BUTTON_RIGHT) && exit->hover) //Main
 	{
-		Player* player = (Player*)Scene::instance->players[0];
-		player->model.setTranslation(4.700, 0, 4.400);
-		player->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
-
 		HCHANNEL music = Audio::GetChannel("data/audio/ambient.mp3");
 		Audio::Stop(music);
 		class PlayStage* play = (class PlayStage*)stages[2];
@@ -143,6 +133,9 @@ void MenuStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
 
 //PlayStage
 void PlayStage::render(std::vector<Stage*> stages) {
+
+	float width = Game::instance->window_width;
+	float height = Game::instance->window_height;
 
 	Player* player = (Player*)Scene::instance->players[0];
 	Camera* camera = (Camera*)Scene::instance->cameras[0];
@@ -160,19 +153,58 @@ void PlayStage::render(std::vector<Stage*> stages) {
 		Scene::instance->bullet_holes[i]->render();
 	}
 
-	Scene::instance->players[0]->render(); //player
+	player->render(); //player
 
-	for (int i = 0; i < Scene::instance->characters.size(); i++) { //enemies
+	for (int i = 0; i < Scene::instance->characters.size(); i++) { //characters
 		Scene::instance->characters[i]->render();
 	}
 
 	//player shoot direction
 	float screen_x = Input::mouse_position.x + Input::mouse_delta.x;
 	float screen_y = Input::mouse_position.y + Input::mouse_delta.y;
-	drawText(screen_x, screen_y-20, ".", Vector3(1, 1, 1), 4);
 
-	//object selected camara
-	//player->boundingSelected();
+	if (current_stage->getStage() == 2) {
+		Gui* scope;
+		if (!player->isShooting)
+			scope = (Gui*)Scene::instance->guis[10];
+		else
+			scope = (Gui*)Scene::instance->guis[11];
+		scope->render(screen_x, screen_y, width, height, false);
+	}
+
+	//talk to a character
+	Character* character;
+	player->nearCharacter = false;
+	bool isTalking = player->isTalking;
+	player->isTalking=false;
+	for (int i = 0; i < Scene::instance->characters.size(); i++) {
+		float dist = Scene::instance->characters[i]->model.getTranslation().distance(player->position_world());
+		if (dist < 1.5) {
+			player->nearCharacter = true;
+			character = (Character*)Scene::instance->characters[i];
+			player->isTalking=isTalking;
+			break;
+		}
+	}
+
+	if (player->nearCharacter) {
+		if (!player->isTalking) {
+			Gui* talk_key = (Gui*)Scene::instance->guis[7];
+			talk_key->render(width / 2, height / 1.2, width * 0.35, height * 0.35);
+		}
+		else {
+			character->text->render(width / 2, height / 1.3, width * 0.6, height * 0.3, false);
+			character->active = true;
+		}
+	}
+
+	if (player->nearObject) {
+		Gui* pick_up = (Gui*)Scene::instance->guis[9];
+		pick_up->render(width / 2, height / 1.2, width * 0.35, height * 0.35);
+	}
+
+	Gui* bullet_1 = (Gui*)Scene::instance->guis[12+player->bullets];
+	bullet_1->render(width/2, height/1.9, width, height);
 
 	//Draw the floor grid
 	if (Scene::instance->mode == 0)
@@ -272,6 +304,7 @@ void PlayStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
 	player->model.rotate((player->yaw), Vector3(0.0f, -1.0f, 0.0f));
 	player->movePlayer(player->targetMove);
 
+	//wait 0.5sec to shoot
 	if (player->canShoot == false) {
 		if(wait==0)
 			wait = Game::instance->time;
@@ -280,19 +313,24 @@ void PlayStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
 			wait = 0;
 		}
 	}
+	if (player->bullets == 0) //no bullets
+		player->canShoot = FALSE;
+
 	//shoot
 	if (Input::mouse_state & SDL_BUTTON_RIGHT) //is left button pressed?
 	{
-		if (!player->isShooting && player->canShoot) {
+		if (!player->isShooting && player->canShoot && !player->isReloading) {
 			Audio::Play("data/audio/shot_revolver.wav", 2000, false);
 			player->shoot();
 		}
 	}
 
 	//reload
-	if (Input::wasKeyPressed(SDL_SCANCODE_R))
+	if (Input::wasKeyPressed(SDL_SCANCODE_R) && !player->isReloading && player->bullets<6)
 	{
 		Audio::Play("data/audio/reload_revolver.wav", 2000, false);
+		player->isReloading = TRUE;
+		player->time_reload = Game::instance->time;
 	}
 
 	//go to menu
@@ -301,30 +339,44 @@ void PlayStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
 		player->canShoot = false;
 		this->current_stage = stages[1];
 	}
+	
+	//action
+	player->pickUp(); //Gui object near and E to pick up object
+	if (Input::wasKeyPressed(SDL_SCANCODE_E))
+	{
+		if (player->nearCharacter) //talk
+			player->isTalking = true;
+		//else //pick up object
+		//	player->pickUp();
+	}
+
+	//game over or won
+	if(player->game_over || player->won)
+		this->current_stage = stages[4];
 
 	if (Input::wasKeyPressed(SDL_SCANCODE_T))
 	{
-		player->x += 0.01;
+		player->x += 0.05;
 	}
 	if (Input::wasKeyPressed(SDL_SCANCODE_Y))
 	{
-		player->x -= 0.01;
+		player->x -= 0.05;
 	}
 	if (Input::wasKeyPressed(SDL_SCANCODE_U))
 	{
-		player->y += 0.01;
+		player->y += 0.05;
 	}
 	if (Input::wasKeyPressed(SDL_SCANCODE_I))
 	{
-		player->y -= 0.01;
+		player->y -= 0.05;
 	}
 	if (Input::wasKeyPressed(SDL_SCANCODE_O))
 	{
-		player->z += 0.01;
+		player->z += 0.05;
 	}
 	if (Input::wasKeyPressed(SDL_SCANCODE_P))
 	{
-		player->z -= 0.01;
+		player->z -= 0.05;
 	}
 
 	//to read the gamepad state
@@ -343,13 +395,19 @@ void PlayStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
 
 //EndStage
 void EndStage::render(std::vector<Stage*> stages) {
-
+	Player* player = (Player*)Scene::instance->players[0];
+	if(player->won)
+		drawText(100, 450, "You win!", Vector3(1, 1, 1), 4);
+	else
+		drawText(100, 450, "you lose :(", Vector3(1, 1, 1), 4);
 }
 
 void EndStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
-
+	Player* player = (Player*)Scene::instance->players[0];
 	if (Input::wasKeyPressed(SDL_SCANCODE_ESCAPE))
 	{
-		
+		player->won = FALSE;
+		player->game_over = FALSE;
+		this->current_stage = stages[3];	
 	}
 }

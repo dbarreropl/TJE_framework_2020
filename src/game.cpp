@@ -79,54 +79,62 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 
 	//player
 	Entity* player = new Player("data/biglib/character.mesh", "data/biglib/WesternPack_renamed/texture.tga");
-	player->model.setTranslation(4.700, 0, 4.400);
+	Vector3 initialPos = Vector3(4.700, 0, 2.400);
+	player->model.setTranslation(initialPos.x, initialPos.y, initialPos.z);
 	player->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
 	Scene::instance->addEntity(player);
 	//cam to player pos
-	//Player* player_s = (Player*)Scene::instance->players[0];
-	//player_s->updateCamera();
+	Player* player_s = (Player*)Scene::instance->players[0];
+	player_s->initialPos = initialPos;
 
 	//characters
-	Entity* Business_Man = new Character("data/biglib/Characters/Business_Man.mesh", "data/biglib/WesternPack_renamed/texture.tga", "data/biglib/old_man_idle.skanim");
-	Business_Man->model.setTranslation(4.700, 0, 4.400);
-	Business_Man->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
-	Scene::instance->addEntity(Business_Man);
+	Entity* BusinessMan = new Character("data/biglib/Characters/Business_Man.mesh", "data/gui/BusinessMan.png", "data/biglib/old_man_idle.skanim");
+	BusinessMan->model.setTranslation(4.700, 0, 4.400);
+	BusinessMan->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
+	BusinessMan->name = "BusinessMan";
+	Scene::instance->addEntity(BusinessMan);
 
-	Entity* CowBoy = new Character("data/biglib/Characters/CowBoy.mesh", "data/biglib/WesternPack_renamed/texture.tga", "data/biglib/arm_stretching.skanim");
+	Entity* CowBoy = new Character("data/biglib/Characters/CowBoy.mesh", "data/gui/text.png", "data/biglib/arm_stretching.skanim");
 	CowBoy->model.setTranslation(2.700, 0, -5.400);
 	CowBoy->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
+	CowBoy->name = "CowBoy";
 	Scene::instance->addEntity(CowBoy);
 
-	Entity* CowGirl = new Character("data/biglib/Characters/CowGirl.mesh", "data/biglib/WesternPack_renamed/texture.tga", "data/biglib/briefcase_idle.skanim");
+	Entity* CowGirl = new Character("data/biglib/Characters/CowGirl.mesh", "data/gui/text.png", "data/biglib/briefcase_idle.skanim");
 	CowGirl->model.setTranslation(2.700, 0, -7.400);
 	CowGirl->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
+	CowGirl->name = "CowGirl";
 	Scene::instance->addEntity(CowGirl);
 
-	Entity* GunMan = new Character("data/biglib/Characters/GunMan.mesh", "data/biglib/WesternPack_renamed/texture.tga", "data/biglib/walk_in_circle.skanim");
+	Entity* GunMan = new Character("data/biglib/Characters/GunMan.mesh", "data/gui/text.png", "data/biglib/walk_in_circle.skanim");
 	GunMan->model.setTranslation(2.700, 0, -9.400);
 	GunMan->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
+	GunMan->name = "GunMan";
 	Scene::instance->addEntity(GunMan);
 
-	Entity* Sheriff = new Character("data/biglib/Characters/Sheriff.mesh", "data/biglib/WesternPack_renamed/texture.tga", "data/biglib/drunk_idle.skanim");
+	Entity* Sheriff = new Character("data/biglib/Characters/Sheriff.mesh", "data/gui/text.png", "data/biglib/drunk_idle.skanim");
 	Sheriff->model.setTranslation(-2.700, 0, -9.400);
 	Sheriff->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
+	Sheriff->name = "Sheriff";
 	Scene::instance->addEntity(Sheriff);
 
-	Entity* Woman = new Character("data/biglib/Characters/Woman.mesh", "data/biglib/WesternPack_renamed/texture.tga", "data/biglib/breathing_idle.skanim");
+	Entity* Woman = new Character("data/biglib/Characters/Woman.mesh", "data/gui/text.png", "data/biglib/breathing_idle.skanim");
 	Woman->model.setTranslation(2.700, 0, -11.400);
 	Woman->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
+	Woman->name = "Woman";
 	Scene::instance->addEntity(Woman);
 
-	Entity* WorkingGirl = new Character("data/biglib/Characters/WorkingGirl.mesh", "data/biglib/WesternPack_renamed/texture.tga", "data/biglib/jazz_dancing.skanim");
+	Entity* WorkingGirl = new Character("data/biglib/Characters/WorkingGirl.mesh", "data/gui/text.png", "data/biglib/jazz_dancing.skanim");
 	WorkingGirl->model.setTranslation(-1.700, 0, -12.400);
 	WorkingGirl->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
+	WorkingGirl->name = "WorkingGirl";
 	Scene::instance->addEntity(WorkingGirl);	
 	
 	//Gui
 	Entity* title = new Gui("data/gui/title.png",false);
 	Scene::instance->addEntity(title);
 
-	Entity* title2 = new Gui("data/gui/title2.png", false);
+	Entity* title2 = new Gui("data/gui/main_play.png", false);
 	Scene::instance->addEntity(title2);
 
 	Entity* icon = new Gui("data/gui/paper.png",true);
@@ -138,8 +146,49 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	Entity* exit = new Gui("data/gui/exit.png", false);
 	Scene::instance->addEntity(exit);
 
-	Entity* loading = new Gui("data/gui/loading2.png", false);
+	Entity* loading = new Gui("data/gui/loading2.png", false); //5
 	Scene::instance->addEntity(loading);
+
+	Entity* text = new Gui("data/gui/text.png", false);
+	Scene::instance->addEntity(text);
+
+	Entity* talk_key = new Gui("data/gui/talk.png", false);
+	Scene::instance->addEntity(talk_key);
+
+	Entity* title3 = new Gui("data/gui/main_exit.png", false);
+	Scene::instance->addEntity(title3);
+
+	Entity* pick_up = new Gui("data/gui/pick_up.png", false);
+	Scene::instance->addEntity(pick_up);
+
+	Entity* scope = new Gui("data/gui/scope.png", false); //10
+	Scene::instance->addEntity(scope);
+
+	Entity* scope_shoot = new Gui("data/gui/scope_shoot.png", false);
+	Scene::instance->addEntity(scope_shoot);
+
+	Entity* bullet_0 = new Gui("data/gui/bullet_0.png", false);
+	Scene::instance->addEntity(bullet_0);
+
+	Entity* bullet_1 = new Gui("data/gui/bullet_1.png", false);
+	Scene::instance->addEntity(bullet_1);
+
+	Entity* bullet_2 = new Gui("data/gui/bullet_2.png", false);
+	Scene::instance->addEntity(bullet_2);
+
+	Entity* bullet_3 = new Gui("data/gui/bullet_3.png", false); //15
+	Scene::instance->addEntity(bullet_3);
+
+	Entity* bullet_4 = new Gui("data/gui/bullet_4.png", false);
+	Scene::instance->addEntity(bullet_4);
+
+	Entity* bullet_5 = new Gui("data/gui/bullet_5.png", false);
+	Scene::instance->addEntity(bullet_5);
+
+	Entity* bullet_6 = new Gui("data/gui/bullet_6.png", false);
+	Scene::instance->addEntity(bullet_6);
+
+
 
 	//Inicializamos BASS al arrancar el juego (id_del_device, muestras por segundo, ...)
 	assert((BASS_Init(-1, 44100, 0, 0, NULL) == true) && "Error opening sound card");
