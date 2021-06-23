@@ -18,6 +18,7 @@ public:
 	Mesh quad;
 	bool invert;
 	bool hover;
+	float number=1;
 
 	Gui() {};
 	Gui(const char* texture, bool invert);

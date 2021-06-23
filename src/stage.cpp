@@ -18,10 +18,34 @@ void IntroStage::render(std::vector<Stage*> stages) {
 }
 
 void IntroStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
-
 	Scene::instance->loadScene();
 	this->current_stage = stages[3];
-	
+
+}
+
+//Tutorial
+void TutoStage::render(std::vector<Stage*> stages) {
+	stages[2]->render(stages);
+
+	float width = Game::instance->window_width;
+	float height = Game::instance->window_height;
+	Gui* paper = (Gui*)Scene::instance->guis[2];
+	paper->render(width / 2, height / 2, width * 0.5, height * 0.7);
+	Gui* close = (Gui*)Scene::instance->guis[32];
+	close->render(width / 1.44, height / 4.3, width * 0.1, height * 0.1,true);
+
+	Gui* tutorial = (Gui*)Scene::instance->guis[33];
+	tutorial->render(width / 1.9, height / 1.75, width, height, false);
+
+}
+
+void TutoStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
+
+	Gui* close = (Gui*)Scene::instance->guis[32];
+	if ((Input::mouse_state & SDL_BUTTON_RIGHT) && close->hover)
+	{
+		this->current_stage = stages[2];
+	}
 }
 
 //MainStage
@@ -39,9 +63,9 @@ void MainStage::render(std::vector<Stage*> stages) {
 	Gui* title = (Gui*)Scene::instance->guis[0];
 	title->render(width / 2, height / 2.8, width * 0.7, height * 0.7);
 	Gui* main_play = (Gui*)Scene::instance->guis[1];
-	main_play->render(width *0.65, height *0.8, width * 0.18, height * 0.14, true);
+	main_play->render(width *0.7, height *0.85, width * 0.18, height * 0.14, true);
 	Gui* main_exit = (Gui*)Scene::instance->guis[8];
-	main_exit->render(width * 0.35, height * 0.8, width * 0.18, height * 0.14, true);
+	main_exit->render(width * 0.3, height * 0.85, width * 0.18, height * 0.14, true);
 }
 
 void MainStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
@@ -50,10 +74,10 @@ void MainStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
 		music_playing = true;
 	}
 
-	Player* player = (Player*)Scene::instance->players[0];
-	player->model.setTranslation(player->initialPos.x, player->initialPos.y, player->initialPos.z);
-	player->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
+	if(Scene::instance->init==FALSE)
+		Scene::instance->initGame();
 
+	Player* player = (Player*)Scene::instance->players[0];
 	Camera* camera = (Camera*)Scene::instance->cameras[0];
 	if(camera->eye.z > -40)
 		camera_move-=0.002;
@@ -79,7 +103,8 @@ void MainStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
 			Audio::Stop(music);
 			camera_move = 0;
 			music_playing = false;
-			this->current_stage = stages[2];
+			player->canShoot = false;
+			this->current_stage = stages[5];
 		}
 	}
 
@@ -89,32 +114,27 @@ void MainStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
 //MenuStage
 void MenuStage::render(std::vector<Stage*> stages) {
 	stages[2]->render(stages);
-	//drawText(100, 450, "MENU", Vector3(1, 1, 1), 4);
 
 	float width = Game::instance->window_width;
 	float height = Game::instance->window_height;
-	Gui* icon = (Gui*)Scene::instance->guis[2];
-	icon->render(width /2, height /2, width*0.45, height*0.6);
-	Gui* resume = (Gui*)Scene::instance->guis[3];
-	//resume->render(width / 2, height / 2.8, width, height, true);
-	resume->render(width / 2, height / 2.7, width/3.5, height/7, true);
-	Gui* exit = (Gui*)Scene::instance->guis[4];
-	exit->render(width / 2, height / 1.7, width/3.5, height/7, true);
 
+	Gui* paper = (Gui*)Scene::instance->guis[2];
+	paper->render(width /2, height /2, width*0.45, height*0.6);
+	Gui* resume = (Gui*)Scene::instance->guis[3];
+	resume->render(width / 2, height / 2.47, width/3.5, height/7, true);
+	Gui* exit = (Gui*)Scene::instance->guis[4];
+	exit->render(width / 2, height / 1.6, width/3.5, height/7, true);
+	Gui* close = (Gui*)Scene::instance->guis[32];
+	close->render(width / 1.49, height / 3.7, width * 0.1, height * 0.1, true);
 }
 
 void MenuStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
 	Gui* resume = (Gui*)Scene::instance->guis[3];
 	Gui* exit = (Gui*)Scene::instance->guis[4];
+	Gui* close = (Gui*)Scene::instance->guis[32];
 	Player* player = (Player*)Scene::instance->players[0];
 
-	if (Input::wasKeyPressed(SDL_SCANCODE_ESCAPE)) //Play
-	{
-		//Input::centerMouse();
-		this->current_stage = stages[2];
-	}
-
-	if ((Input::mouse_state & SDL_BUTTON_RIGHT) && resume->hover) //Play
+	if (((Input::mouse_state & SDL_BUTTON_RIGHT) && (resume->hover || close->hover)) || Input::wasKeyPressed(SDL_SCANCODE_ESCAPE)) //Play
 	{
 		this->current_stage = stages[2];
 	}
@@ -125,6 +145,7 @@ void MenuStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
 		Audio::Stop(music);
 		class PlayStage* play = (class PlayStage*)stages[2];
 		play->music_playing = false;
+		Scene::instance->init = FALSE;
 		this->current_stage = stages[3];
 	}
 
@@ -179,12 +200,14 @@ void PlayStage::render(std::vector<Stage*> stages) {
 	player->isTalking=false;
 	for (int i = 0; i < Scene::instance->characters.size(); i++) {
 		float dist = Scene::instance->characters[i]->model.getTranslation().distance(player->position_world());
-		if (dist < 1.5) {
+		character = (Character*)Scene::instance->characters[i];
+		if (dist < 2) {
 			player->nearCharacter = true;
-			character = (Character*)Scene::instance->characters[i];
 			player->isTalking=isTalking;
 			break;
 		}
+		if (character->talked)
+			character->active = TRUE;
 	}
 
 	if (player->nearCharacter) {
@@ -193,8 +216,14 @@ void PlayStage::render(std::vector<Stage*> stages) {
 			talk_key->render(width / 2, height / 1.2, width * 0.35, height * 0.35);
 		}
 		else {
-			character->text->render(width / 2, height / 1.3, width * 0.6, height * 0.3, false);
-			character->active = true;
+			if (character->active && character->condition()) {
+				character->text_done->render(width / 2, height / 1.3, width * 0.6, height * 0.3, false);
+				character->done = TRUE;
+			}
+			else {
+				character->text->render(width / 2, height / 1.3, width * 0.6, height * 0.3, false);
+				character->talked = TRUE;
+			}
 		}
 	}
 
@@ -203,15 +232,22 @@ void PlayStage::render(std::vector<Stage*> stages) {
 		pick_up->render(width / 2, height / 1.2, width * 0.35, height * 0.35);
 	}
 
-	Gui* bullet_1 = (Gui*)Scene::instance->guis[12+player->bullets];
-	bullet_1->render(width/2, height/1.9, width, height);
+	Gui* bullets = (Gui*)Scene::instance->guis[12+player->bullets];
+	bullets->render(width/2, height/1.9, width, height);
+
+	//player objects
+	for (int i = 0; i < player->objects.size(); i++) {
+		Gui* object = (Gui*)player->objects[i]; //object
+		object->render(width / (2- (i*0.25)), height / 1.9, width, height);
+		Gui* number = (Gui*)(Gui*)Scene::instance->guis[19+object->number]; //number
+		number->render(width / (2 - (i * 0.25)), height / 1.9, width, height);
+	}
 
 	//Draw the floor grid
-	if (Scene::instance->mode == 0)
-		drawGrid(); 
-	
-	//render the FPS, Draw Calls, etc
-	drawText(2, 2, getGPUStats(), Vector3(1, 1, 1), 2);
+	if (Scene::instance->mode == 0) {
+		drawGrid();
+		drawText(2, 2, getGPUStats(), Vector3(1, 1, 1), 2); //render the FPS, Draw Calls, etc
+	}
 }
 
 void PlayStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
@@ -266,7 +302,6 @@ void PlayStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
 	}
 
 	player->targetMove = playerSpeed;
-
 	player->aux = false;
 	player->height_floor = -0.05;
 	
@@ -346,14 +381,17 @@ void PlayStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
 	{
 		if (player->nearCharacter) //talk
 			player->isTalking = true;
-		//else //pick up object
-		//	player->pickUp();
 	}
 
 	//game over or won
-	if(player->game_over || player->won)
+	if (player->game_over || player->won) {
+		HCHANNEL music = Audio::GetChannel("data/audio/ambient.mp3");
+		Audio::Stop(music);
 		this->current_stage = stages[4];
+	}
 
+	Character* character= (Character*)Scene::instance->characters[5];
+	//character->model.setTranslation(player->x, player->y, player->z);
 	if (Input::wasKeyPressed(SDL_SCANCODE_T))
 	{
 		player->x += 0.05;
@@ -395,11 +433,36 @@ void PlayStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
 
 //EndStage
 void EndStage::render(std::vector<Stage*> stages) {
+	stages[2]->render(stages);
+
+	float width = Game::instance->window_width;
+	float height = Game::instance->window_height;
 	Player* player = (Player*)Scene::instance->players[0];
-	if(player->won)
-		drawText(100, 450, "You win!", Vector3(1, 1, 1), 4);
-	else
-		drawText(100, 450, "you lose :(", Vector3(1, 1, 1), 4);
+
+	class PlayStage* play = (class PlayStage*)stages[2];
+	play->music_playing = false;
+
+	if (player->won) {
+		Gui* won = (Gui*)Scene::instance->guis[31];
+		won->render(width / 2, height / 2, width, height, false);
+		if (!music_playing) {
+			Audio::Play("data/audio/won.wav", 2000, false);
+			music_playing = true;
+		}
+	}
+	else {
+		Gui* gameover = (Gui*)Scene::instance->guis[30];
+		gameover->render(width / 2, height / 2, width, height, false);
+		if (!music_playing) {
+			Audio::Play("data/audio/gameover.wav", 2000, false);
+			music_playing = true;
+		}
+	}
+
+	Gui* exit = (Gui*)Scene::instance->guis[4];
+	exit->render(width / 2, height / 1.3, width / 4, height / 8, true);
+
+	SDL_ShowCursor(true);
 }
 
 void EndStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
@@ -408,6 +471,18 @@ void EndStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
 	{
 		player->won = FALSE;
 		player->game_over = FALSE;
-		this->current_stage = stages[3];	
+		music_playing = false;
+		Scene::instance->init = FALSE;
+		this->current_stage = stages[3];
+	}
+
+	Gui* exit = (Gui*)Scene::instance->guis[4];
+	if ((Input::mouse_state & SDL_BUTTON_RIGHT) && exit->hover) //Exit
+	{
+		player->won = FALSE;
+		player->game_over = FALSE;
+		music_playing = false;
+		Scene::instance->init = FALSE;
+		this->current_stage = stages[3];
 	}
 }

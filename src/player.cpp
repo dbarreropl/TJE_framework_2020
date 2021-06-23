@@ -11,8 +11,7 @@ void Player::render()
 
 	if (shader && this->visible == TRUE)
 	{
-		Skeleton result=shot->skeleton;
-		Skeleton result2;
+		Skeleton result = shot->skeleton;
 
 		if (isReloading) {
 			reload->assignTime(time - time_reload);
@@ -40,23 +39,27 @@ void Player::render()
 		if (isMoving) {
 			walk->assignTime(time_walk);
 		}
-		walk->assignTime(0);;
+		walk->assignTime(0);
 		blendSkeleton(&result, &walk->skeleton, 0.5f, &result);
-		blendSkeleton(&walk->skeleton, &shot->skeleton, 0.5f, &result2);
 		//walk->assignTime(0, RIGHT_ARM);
 
 		//gun
-		Matrix44& RightArm = result.getBoneMatrix("mixamorig_RightArm");
-		//RightArm.rotate(pitch, Vector3(1.75f, -0.5f, 1.0f));
-
+		//Vector3 Center = (camera->center - camera->eye).normalize();
+		//Vector3 pos = camera->eye + (Center * 1.0f);
 		Matrix44& RightHand = result.getBoneMatrix("mixamorig_RightHand", false);
-		Matrix44& RightHand2 = result2.getBoneMatrix("mixamorig_RightHand", false);
+		RightHand.rotate(pitch, Vector3(x, y, z));
+		RightHand.translate(0,-pitch*0.04,0);
+
+		//Matrix44& RightForeArm = result.getBoneMatrix("mixamorig_RightArm", false);
+		//RightForeArm.translate(0, -pitch * 0.5, 0);
+
 		gun.model = model;
 		gun.model.translate(-0.03, 0.01, -0.2);
 		gun.model = RightHand * gun.model;
 		gun.model.rotate(70 * DEG2RAD, Vector3(0, 0, 1));
 		gun.model.rotate(55 * DEG2RAD, Vector3(0, 1, 0));
 		//gun.model.rotate(time * 100 * DEG2RAD, Vector3(1, 0, 0));
+		//gun.model.setTranslation(pos.x, pos.y, pos.z); //...
 		gun.render();
 
 		//shader = Shader::current;
@@ -165,11 +168,47 @@ void Player::pickUp()
 					if (Input::wasKeyPressed(SDL_SCANCODE_E)) {
 						Audio::Play("data/audio/pick_up.wav", 2000, false);
 						current->visible = FALSE;
+						addObject(current);
 						break;
 					}
 				}
 			}
 		}
+	}
+}
+
+void Player::addObject(Entity* entity)
+{
+	if (entity->name=="SM_Prop_Card") {
+		Gui* card = (Gui*)Scene::instance->guis[19];
+		if (hasObject(entity->name)==0) { //if doesnt has object add it
+			card->name = entity->name;
+			objects.push_back(card);
+		}
+		else //+1
+		{
+			if(card->number<10)
+				card->number += 1;
+		}
+	}
+}
+
+bool Player::hasObject(std::string object) {
+
+	for (int i = 0; i < objects.size(); i++) {
+		Gui* player_object = (Gui*)objects[i];
+		if (object == player_object->name)
+			return true;
+	}
+	return false;
+}
+
+float Player::numberObjects(std::string object) {
+
+	for (int i = 0; i < objects.size(); i++) {
+		Gui* player_object = (Gui*)objects[i];
+		if (object == player_object->name)
+			return player_object->number;
 	}
 }
 
@@ -212,7 +251,6 @@ void Player::shoot()
 		}
 	}
 
-
 	//near entity
 	Vector3 pos = this->model.getTranslation();
 	Entity* entity = NULL;
@@ -229,46 +267,52 @@ void Player::shoot()
 		}
 	}
 
-	if (entity && entity->type == 4 && entity->name == "BusinessMan")
-		won = true;
-	else if (entity && entity->type == 4)
-		game_over = true;
+	if (entity && entity->type == 4) {
+		Character* character = (Character*)entity;
+		character->dead = TRUE;
+		character->time_dead = Game::instance->time;
+		if (entity->name == "BusinessMan")
+			won = true;
+		else
+			game_over = true;
+	}
+	else {
+		//create bullet hole
+		if (entity) {
+			Mesh* mesh = Mesh::Get("data/bullet.obj");
+			Texture* texture = Texture::Get("data/bullet2.png");
+			Shader* shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+			EntityMesh* entity_sh = new EntityMesh();
+			entity_sh->mesh = mesh;
+			entity_sh->texture = texture;
+			entity_sh->shader = shader;
+			entity_sh->visible = TRUE;
 
-	//create bullet hole
-	if (entity) {
-		Mesh* mesh = Mesh::Get("data/bullet.obj");
-		Texture* texture = Texture::Get("data/bullet2.png");
-		Shader* shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
-		EntityMesh* entity_sh = new EntityMesh();
-		entity_sh->mesh = mesh;
-		entity_sh->texture = texture;
-		entity_sh->shader = shader;
-		entity_sh->visible = TRUE;
-	
-		//hole near player
-		if (pos.x > entity_col.x)
-			entity_col.x = entity_col.x + 0.01;
-		else
-			entity_col.x = entity_col.x - 0.01;
-		if (pos.y > entity_col.y)
-			entity_col.y = entity_col.y + 0.01;
-		else
-			entity_col.y = entity_col.y - 0.01;
-		if (pos.z > entity_col.z)
-			entity_col.z = entity_col.z + 0.01;
-		else
-			entity_col.z = entity_col.z - 0.01;
+			//hole near player
+			if (pos.x > entity_col.x)
+				entity_col.x = entity_col.x + 0.01;
+			else
+				entity_col.x = entity_col.x - 0.01;
+			if (pos.y > entity_col.y)
+				entity_col.y = entity_col.y + 0.01;
+			else
+				entity_col.y = entity_col.y - 0.01;
+			if (pos.z > entity_col.z)
+				entity_col.z = entity_col.z + 0.01;
+			else
+				entity_col.z = entity_col.z - 0.01;
 
-		//error normalize lenght
-		if (abs(entity_normal.x) < 0.000001)
-			entity_normal.x = 0.000001;
-		if (abs(entity_normal.y) < 0.000001)
-			entity_normal.y = 0.000001;
-		if (abs(entity_normal.z) < 0.000001)
-			entity_normal.z = 0.000001;
-	
-		entity_sh->model.setTranslation(entity_col.x, entity_col.y, entity_col.z);
-		entity_sh->model.setFrontAndOrthonormalize(entity_normal);
-		Scene::instance->addBulletHole(entity_sh);
+			//error normalize lenght
+			if (abs(entity_normal.x) < 0.000001)
+				entity_normal.x = 0.000001;
+			if (abs(entity_normal.y) < 0.000001)
+				entity_normal.y = 0.000001;
+			if (abs(entity_normal.z) < 0.000001)
+				entity_normal.z = 0.000001;
+
+			entity_sh->model.setTranslation(entity_col.x, entity_col.y, entity_col.z);
+			entity_sh->model.setFrontAndOrthonormalize(entity_normal);
+			Scene::instance->addBulletHole(entity_sh);
+		}
 	}
 }

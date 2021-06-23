@@ -7,9 +7,10 @@
 class Player : public EntityMesh
 {
 public:
-	float x=0, y=0, z=0;
+	float x=0.3, y=-0.35, z=1.15;
 	Vector3 initialPos;
 	Vector3 targetMove;
+	std::vector <Entity*> objects;
 
 	Animation* walk;
 	Animation* shot;
@@ -61,6 +62,9 @@ public:
 	bool testCollision(EntityMesh* entity, Vector3 targetMove);
 
 	void pickUp();
+	void addObject(Entity* entity);
+	bool hasObject(std::string object);
+	float numberObjects(std::string object);
 
 	void shoot();
 };

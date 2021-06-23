@@ -58,6 +58,7 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	stages.push_back(new PlayStage());
 	stages.push_back(new MainStage());
 	stages.push_back(new EndStage());
+	stages.push_back(new TutoStage());
 	Stage::current_stage = stages[0]; //Intro Stage at start
 
 	//Scene
@@ -88,45 +89,43 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	player_s->initialPos = initialPos;
 
 	//characters
-	Entity* BusinessMan = new Character("data/biglib/Characters/Business_Man.mesh", "data/gui/BusinessMan.png", "data/biglib/old_man_idle.skanim");
+	Entity* BusinessMan = new Character("data/biglib/Characters/Business_Man.mesh", "data/gui/BusinessMan.png", "data/gui/BusinessMan_done.png", "data/biglib/old_man_idle.skanim");
 	BusinessMan->model.setTranslation(4.700, 0, 4.400);
 	BusinessMan->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
 	BusinessMan->name = "BusinessMan";
 	Scene::instance->addEntity(BusinessMan);
 
-	Entity* CowBoy = new Character("data/biglib/Characters/CowBoy.mesh", "data/gui/text.png", "data/biglib/arm_stretching.skanim");
-	CowBoy->model.setTranslation(2.700, 0, -5.400);
-	CowBoy->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
+	Entity* CowBoy = new Character("data/biglib/Characters/CowBoy.mesh", "data/gui/text.png", "data/gui/text.png", "data/biglib/arm_stretching.skanim");
+	CowBoy->model.setTranslation(12.800, 0, -12.4);
+	CowBoy->model.rotate(DEG2RAD * 90.f, Vector3(0.0f, 1.0f, 0.0f));
 	CowBoy->name = "CowBoy";
 	Scene::instance->addEntity(CowBoy);
 
-	Entity* CowGirl = new Character("data/biglib/Characters/CowGirl.mesh", "data/gui/text.png", "data/biglib/briefcase_idle.skanim");
-	CowGirl->model.setTranslation(2.700, 0, -7.400);
-	CowGirl->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
+	Entity* CowGirl = new Character("data/biglib/Characters/CowGirl.mesh", "data/gui/text.png", "data/gui/text.png", "data/biglib/briefcase_idle.skanim");
+	CowGirl->model.setTranslation(-2.2, 0, -13.9);
 	CowGirl->name = "CowGirl";
 	Scene::instance->addEntity(CowGirl);
 
-	Entity* GunMan = new Character("data/biglib/Characters/GunMan.mesh", "data/gui/text.png", "data/biglib/walk_in_circle.skanim");
-	GunMan->model.setTranslation(2.700, 0, -9.400);
-	GunMan->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
+	Entity* GunMan = new Character("data/biglib/Characters/GunMan.mesh", "data/gui/text.png", "data/gui/text.png", "data/biglib/sitting.skanim");
+	GunMan->model.setTranslation(8.7, 0.2, -19.4);
 	GunMan->name = "GunMan";
 	Scene::instance->addEntity(GunMan);
 
-	Entity* Sheriff = new Character("data/biglib/Characters/Sheriff.mesh", "data/gui/text.png", "data/biglib/drunk_idle.skanim");
-	Sheriff->model.setTranslation(-2.700, 0, -9.400);
-	Sheriff->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
+	Entity* Sheriff = new Character("data/biglib/Characters/Sheriff.mesh", "data/gui/text.png", "data/gui/text.png", "data/biglib/drunk_idle.skanim");
+	Sheriff->model.setTranslation(3.8, 0, -37.9);
+	Sheriff->model.rotate(DEG2RAD * 90.f, Vector3(0.0f, 1.0f, 0.0f));
 	Sheriff->name = "Sheriff";
 	Scene::instance->addEntity(Sheriff);
 
-	Entity* Woman = new Character("data/biglib/Characters/Woman.mesh", "data/gui/text.png", "data/biglib/breathing_idle.skanim");
-	Woman->model.setTranslation(2.700, 0, -11.400);
+	Entity* Woman = new Character("data/biglib/Characters/Woman.mesh", "data/gui/text.png", "data/gui/text.png", "data/biglib/breathing_idle.skanim");
+	Woman->model.setTranslation(-9.700, 0, -38.49);
 	Woman->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
 	Woman->name = "Woman";
 	Scene::instance->addEntity(Woman);
 
-	Entity* WorkingGirl = new Character("data/biglib/Characters/WorkingGirl.mesh", "data/gui/text.png", "data/biglib/jazz_dancing.skanim");
-	WorkingGirl->model.setTranslation(-1.700, 0, -12.400);
-	WorkingGirl->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
+	Entity* WorkingGirl = new Character("data/biglib/Characters/WorkingGirl.mesh", "data/gui/text.png", "data/gui/text.png", "data/biglib/jazz_dancing.skanim");
+	WorkingGirl->model.setTranslation(-17.2, 0.5, -13.4);
+	WorkingGirl->model.rotate(DEG2RAD * 270.f, Vector3(0.0f, 1.0f, 0.0f));
 	WorkingGirl->name = "WorkingGirl";
 	Scene::instance->addEntity(WorkingGirl);	
 	
@@ -137,8 +136,8 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	Entity* title2 = new Gui("data/gui/main_play.png", false);
 	Scene::instance->addEntity(title2);
 
-	Entity* icon = new Gui("data/gui/paper.png",true);
-	Scene::instance->addEntity(icon);
+	Entity* paper = new Gui("data/gui/paper.png",true);
+	Scene::instance->addEntity(paper);
 
 	Entity* resume = new Gui("data/gui/resume.png", false);
 	Scene::instance->addEntity(resume);
@@ -188,10 +187,54 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	Entity* bullet_6 = new Gui("data/gui/bullet_6.png", false);
 	Scene::instance->addEntity(bullet_6);
 
+	Entity* card = new Gui("data/gui/card.png", false);
+	Scene::instance->addEntity(card);
 
+	Entity* object_1 = new Gui("data/gui/object_1.png", false); //20
+	Scene::instance->addEntity(object_1);
+
+	Entity* object_2 = new Gui("data/gui/object_2.png", false); 
+	Scene::instance->addEntity(object_2);
+
+	Entity* object_3 = new Gui("data/gui/object_3.png", false);
+	Scene::instance->addEntity(object_3);
+
+	Entity* object_4 = new Gui("data/gui/object_4.png", false);
+	Scene::instance->addEntity(object_4);
+
+	Entity* object_5 = new Gui("data/gui/object_5.png", false);
+	Scene::instance->addEntity(object_5);
+
+	Entity* object_6 = new Gui("data/gui/object_6.png", false); //25
+	Scene::instance->addEntity(object_6);
+
+	Entity* object_7 = new Gui("data/gui/object_7.png", false);
+	Scene::instance->addEntity(object_7);
+
+	Entity* object_8 = new Gui("data/gui/object_8.png", false);
+	Scene::instance->addEntity(object_8);
+
+	Entity* object_9 = new Gui("data/gui/object_9.png", false);
+	Scene::instance->addEntity(object_9);
+
+	Entity* object_9p = new Gui("data/gui/object_9+.png", false);
+	Scene::instance->addEntity(object_9p);
+
+	Entity* gameover = new Gui("data/gui/gameover.png", false); //30
+	Scene::instance->addEntity(gameover);
+
+	Entity* won = new Gui("data/gui/won.png", false);
+	Scene::instance->addEntity(won);
+
+	Entity* close = new Gui("data/gui/close.png", false);
+	Scene::instance->addEntity(close);
+
+	Entity* tutorial = new Gui("data/gui/tutorial.png", false);
+	Scene::instance->addEntity(tutorial);
 
 	//Inicializamos BASS al arrancar el juego (id_del_device, muestras por segundo, ...)
-	assert((BASS_Init(-1, 44100, 0, 0, NULL) == true) && "Error opening sound card");
+	if(!BASS_Init(-1, 44100, 0, 0, NULL))
+		assert("Error opening sound card");
 
 	//hide the cursor
 	SDL_ShowCursor(!mouse_locked); //hide or show the mouse

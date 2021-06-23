@@ -9,6 +9,34 @@ Scene::Scene()
 	instance = this;
 }
 
+void Scene::initGame()
+{
+	Player* player = (Player*)Scene::instance->players[0];
+	player->model.setTranslation(player->initialPos.x, player->initialPos.y, player->initialPos.z);
+	player->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
+	player->bullets = 6;
+	for (int i = 0; i < Scene::instance->characters.size(); i++) {
+		Character* current = (Character*)Scene::instance->characters[i];
+		current->dead = FALSE;
+	}
+	for (int i = 0; i < Scene::instance->entities.size(); i++) {
+		EntityMesh* current = (EntityMesh*)Scene::instance->entities[i];
+		current->visible = TRUE;
+	}
+
+	//bullet holes
+	Scene::instance->bullet_holes.clear();
+
+	//objects
+	player->objects.clear();
+	for (int i = 0; i < Scene::instance->guis.size(); i++) {
+		Gui* object = (Gui*)Scene::instance->guis[i];
+		object->number = 1;
+	}
+
+
+	init = TRUE;
+}
 void Scene::addEntity(Entity* Entity){
 	
 	if (Entity->type == 0) {
@@ -82,8 +110,10 @@ void Scene::loadScene() {
 		//name
 		entity->name = data_spl[0].c_str();
 		Scene::instance->addEntity(entity);
-		if (!data_spl[0].find("SM_Prop_Poker_Chip"))
+		if (!data_spl[0].find("SM_Prop_Card")) {
 			entity->can_pickUp = true;
+			entity->name = "SM_Prop_Card";
+		}
 	}
 	this->loaded = TRUE;
 

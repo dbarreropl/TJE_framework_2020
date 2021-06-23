@@ -20,10 +20,10 @@ public:
 	std::vector <Entity*> cameras;
 	std::vector <Entity*> lights;
 	std::vector <Entity*> guis;
-
 	std::vector <Entity*> bullet_holes;
 	
 	bool loaded = FALSE;
+	bool init = false;
 
 	bool mode=1; //mode edit=0, mode play=1
 
@@ -34,4 +34,5 @@ public:
 	void addEntity(Entity* Entity);
 	void addBulletHole(Entity* Entity);
 	void loadScene();
+	void initGame();
 };
