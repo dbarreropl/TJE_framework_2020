@@ -23,12 +23,31 @@ void Character::render()
 
 			result = die->skeleton;
 			//die->assignTime(time);
+			if (!pos_dead) {
+				Vector3 newPos = model2.getTranslation()-model.getTranslation();
+				Matrix44 T;
+				T.setTranslation(newPos.x, 0, newPos.z);
+				model = T*model;
+				pos_dead = TRUE;
+			}
 		}
 		else {
 			result = idle->skeleton;
 			idle->assignTime(time);
 		}
-		
+		if (!dead) {
+			if (!(this->name == "MexicanMale2"))
+				model2 = model;
+			else {
+				//Matrix44 Spine = result.getBoneMatrix("mixamorig_Spine", false);
+				model2 = result.getBoneMatrix("mixamorig_Spine", false) * model;
+				Vector3 a = model2.getTranslation();
+				//std::cout << a.x << std::endl;
+				//std::cout << a.y << std::endl;
+				//std::cout << a.z << std::endl;
+			}
+		}
+
 		//upload uniforms
 		shader->setUniform("u_color", Vector4(1, 1, 1, 1));
 		shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
@@ -60,6 +79,10 @@ void Character::condition()
 				condition = false;
 		}
 	}
+	if (this->name == "GoldMiner") {
+		if (player->bootlesBroke > 5)
+			condition = true;
+	}
 
 	this->done = condition;
 	if (condition && !finish) {
@@ -76,5 +99,8 @@ void Character::onTalk()
 		for (int i = 0; i < Scene::instance->targets.size(); i++) { //targets
 			Scene::instance->targets[i]->visible = TRUE;
 		}
+	}
+	if (this->name == "GoldMiner") {
+		player->bootlesBroke = 0;
 	}
 }

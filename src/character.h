@@ -28,14 +28,19 @@ public:
 	float time_dead;
 	float mission;
 
-	Character(float mission, const char* mesh, const char* text, const char* text_done, const char* idle)
-		: EntityMesh(mesh, "data/biglib/WesternPack_renamed/texture.tga") {
+	bool pos_dead = FALSE;
+
+	Character(float mission, bool isNew, const char* mesh, const char* texture, const char* text, const char* text_done, const char* idle)
+		: EntityMesh(mesh, texture) {
 		
 		this->setType(4);
 		this->mission = mission;
 		this->render_always = 1;
 		this->idle = Animation::Get(idle);
-		this->die = Animation::Get("data/biglib/die.skanim");
+		if(isNew)
+			this->die = Animation::Get("data/biglib/die2.skanim");
+		else
+			this->die = Animation::Get("data/biglib/die.skanim");
 		this->text = new Gui(text, false);
 		this->text_done = new Gui(text_done, false);
 		this->def= new Gui("data/gui/text.png", false);

@@ -108,7 +108,7 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	player_s->initialPos = initialPos;
 
 	//characters
-	Entity* BusinessMan = new Character(2,"data/biglib/Characters/Business_Man.mesh", "data/gui/BusinessMan.png", "data/gui/BusinessMan_done.png", "data/biglib/old_man_idle.skanim");
+	Entity* BusinessMan = new Character(2,0,"data/biglib/Characters/Business_Man.mesh","data/biglib/WesternPack_renamed/texture.tga", "data/gui/BusinessMan.png", "data/gui/BusinessMan_done.png", "data/biglib/old_man_idle.skanim");
 	BusinessMan->model.setTranslation(4.700, 0, 4.400);
 	BusinessMan->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
 	BusinessMan->name = "BusinessMan";
@@ -116,23 +116,23 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	Character* BusinessMan_character = (Character*)Scene::instance->characters.back();
 	BusinessMan_character->setMissionGui("data/gui/BusinessMan_mission_in.png", "data/gui/BusinessMan_mission_next.png", "data/gui/BusinessMan_mission_done.png");
 
-	Entity* CowBoy = new Character(3,"data/biglib/Characters/CowBoy.mesh", "data/gui/text.png", "data/gui/text.png", "data/biglib/arm_stretching.skanim");
+	Entity* CowBoy = new Character(8,0,"data/biglib/Characters/CowBoy.mesh", "data/biglib/WesternPack_renamed/texture.tga", "data/gui/text.png", "data/gui/text.png", "data/biglib/arm_stretching.skanim");
 	CowBoy->model.setTranslation(12.800, 0, -12.4);
 	CowBoy->model.rotate(DEG2RAD * 90.f, Vector3(0.0f, 1.0f, 0.0f));
 	CowBoy->name = "CowBoy";
 	Scene::instance->addEntity(CowBoy);
 
-	Entity* CowGirl = new Character(4,"data/biglib/Characters/CowGirl.mesh", "data/gui/text.png", "data/gui/text.png", "data/biglib/briefcase_idle.skanim");
+	Entity* CowGirl = new Character(8,0,"data/biglib/Characters/CowGirl.mesh", "data/biglib/WesternPack_renamed/texture.tga", "data/gui/text.png", "data/gui/text.png", "data/biglib/briefcase_idle.skanim");
 	CowGirl->model.setTranslation(-2.2, 0, -13.9);
 	CowGirl->name = "CowGirl";
 	Scene::instance->addEntity(CowGirl);
 
-	Entity* GunMan = new Character(5,"data/biglib/Characters/GunMan.mesh", "data/gui/text.png", "data/gui/text.png", "data/biglib/sitting.skanim");
+	Entity* GunMan = new Character(8,0,"data/biglib/Characters/GunMan.mesh", "data/biglib/WesternPack_renamed/texture.tga", "data/gui/text.png", "data/gui/text.png", "data/biglib/sitting.skanim");
 	GunMan->model.setTranslation(8.7, 0.2, -19.4);
 	GunMan->name = "GunMan";
 	Scene::instance->addEntity(GunMan);
 
-	Entity* Sheriff = new Character(1,"data/biglib/Characters/Sheriff.mesh", "data/gui/Sheriff.png","data/gui/Sheriff_done.png", "data/biglib/drunk_idle.skanim");
+	Entity* Sheriff = new Character(1,0,"data/biglib/Characters/Sheriff.mesh", "data/biglib/WesternPack_renamed/texture.tga", "data/gui/Sheriff.png","data/gui/Sheriff_done.png", "data/biglib/drunk_idle.skanim");
 	Sheriff->model.setTranslation(3.8, 0, -37.9);
 	Sheriff->model.rotate(DEG2RAD * 90.f, Vector3(0.0f, 1.0f, 0.0f));
 	Sheriff->name = "Sheriff";
@@ -140,17 +140,84 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	Character* Sheriff_character = (Character*)Scene::instance->characters.back();
 	Sheriff_character->setMissionGui("data/gui/Sheriff_mission_in.png", "data/gui/Sheriff_mission_next.png","data/gui/Sheriff_mission_done.png");
 
-	Entity* Woman = new Character(6,"data/biglib/Characters/Woman.mesh", "data/gui/text.png", "data/gui/text.png", "data/biglib/breathing_idle.skanim");
+	Entity* Woman = new Character(8,0,"data/biglib/Characters/Woman.mesh", "data/biglib/WesternPack_renamed/texture4.tga", "data/gui/text.png", "data/gui/text.png", "data/biglib/breathing_idle.skanim");
 	Woman->model.setTranslation(-9.700, 0, -38.49);
 	Woman->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
 	Woman->name = "Woman";
 	Scene::instance->addEntity(Woman);
 
-	Entity* WorkingGirl = new Character(7,"data/biglib/Characters/WorkingGirl.mesh", "data/gui/text.png", "data/gui/text.png", "data/biglib/jazz_dancing.skanim");
+	Entity* WorkingGirl = new Character(8,0,"data/biglib/Characters/WorkingGirl.mesh", "data/biglib/WesternPack_renamed/texture.tga", "data/gui/text.png", "data/gui/text.png", "data/biglib/jazz_dancing.skanim");
 	WorkingGirl->model.setTranslation(-17.2, 0.5, -13.4);
 	WorkingGirl->model.rotate(DEG2RAD * 270.f, Vector3(0.0f, 1.0f, 0.0f));
 	WorkingGirl->name = "WorkingGirl";
-	Scene::instance->addEntity(WorkingGirl);	
+	Scene::instance->addEntity(WorkingGirl);
+
+	Entity* GoldMiner = new Character(3,1, "data/biglib/NewCharacters/GoldMiner.mesh", "data/biglib/WesternPack_renamed/texture4.tga", "data/gui/GoldMiner.png", "data/gui/GoldMiner_done.png", "data/biglib/breathing_idle2.skanim");
+	GoldMiner->model.setTranslation(-13, 0.5, -16);
+	GoldMiner->model.scale(0.01, 0.01, 0.01);
+	GoldMiner->name = "GoldMiner";
+	Scene::instance->addEntity(GoldMiner); //7
+	Character* GoldMiner_character = (Character*)Scene::instance->characters.back();
+	GoldMiner_character->setMissionGui("data/gui/GoldMiner_mission_in.png", "data/gui/GoldMiner_mission_next.png", "data/gui/GoldMiner_mission_done.png");
+
+	Entity* GoldMiner2 = new Character(8,1, "data/biglib/NewCharacters/GoldMiner2.mesh", "data/biglib/WesternPack_renamed/texture4.tga", "data/gui/text.png", "data/gui/text.png", "data/biglib/breathing_idle2.skanim");
+	GoldMiner2->model.setTranslation(-13, 0, -28.5);
+	GoldMiner2->model.rotate(90*DEG2RAD,Vector3(0, -1, 0));
+	GoldMiner2->model.scale(0.01, 0.01, 0.01);
+	GoldMiner2->name = "GoldMiner2";
+	Scene::instance->addEntity(GoldMiner2);
+
+	Entity* Hunter = new Character(8, 1,"data/biglib/NewCharacters/Hunter.mesh", "data/biglib/WesternPack_renamed/texture4.tga", "data/gui/text.png", "data/gui/text.png", "data/biglib/breathing_idle2.skanim");
+	Hunter->model.setTranslation(-29, 0, -2.5);
+	Hunter->model.scale(0.01, 0.01, 0.01);
+	Hunter->name = "Hunter";
+	Scene::instance->addEntity(Hunter);
+
+	Entity* MexicanFemale = new Character(8, 1,"data/biglib/NewCharacters/MexicanFemale.mesh", "data/biglib/WesternPack_renamed/texture4.tga", "data/gui/text.png", "data/gui/text.png", "data/biglib/breathing_idle2.skanim");
+	MexicanFemale->model.setTranslation(-11, 0, -51);
+	MexicanFemale->model.rotate(90 * DEG2RAD, Vector3(0, -1, 0));
+	MexicanFemale->model.scale(0.01, 0.01, 0.01);
+	MexicanFemale->name = "MexicanFemale";
+	Scene::instance->addEntity(MexicanFemale);
+
+	Entity* Traveller = new Character(8,1, "data/biglib/NewCharacters/Traveller.mesh", "data/biglib/WesternPack_renamed/texture4.tga", "data/gui/text.png", "data/gui/text.png", "data/biglib/breathing_idle2.skanim");
+	Traveller->model.setTranslation(6, 3, -10.5);
+	Traveller->model.rotate(90 * DEG2RAD, Vector3(0, 1, 0));
+	Traveller->model.scale(0.01, 0.01, 0.01);
+	Traveller->name = "Traveller";
+	Scene::instance->addEntity(Traveller);
+
+	Entity* MexicanMale = new Character(8, 1,"data/biglib/NewCharacters/MexicanMale.mesh", "data/biglib/WesternPack_renamed/texture4.tga", "data/gui/text.png", "data/gui/text.png", "data/biglib/walk_in_circle2.skanim");
+	MexicanMale->model.setTranslation(0, 0, -24);
+	MexicanMale->model.scale(0.01, 0.01, 0.01);
+	MexicanMale->name = "MexicanMale";
+	Scene::instance->addEntity(MexicanMale);
+
+	Entity* MexicanMale2 = new Character(8,1, "data/biglib/NewCharacters/MexicanMale2.mesh", "data/biglib/WesternPack_renamed/texture4.tga", "data/gui/text.png", "data/gui/text.png", "data/biglib/walk_in_circle2.skanim");
+	MexicanMale2->model.setTranslation(15, 0, 0);
+	MexicanMale2->model.scale(0.01, 0.01, 0.01);
+	MexicanMale2->name = "MexicanMale2";
+	Scene::instance->addEntity(MexicanMale2);
+
+	Entity* PriestMan = new Character(8,1, "data/biglib/NewCharacters/PriestMan.mesh", "data/biglib/WesternPack_renamed/texture4.tga", "data/gui/text.png", "data/gui/text.png", "data/biglib/breathing_idle2.skanim");
+	PriestMan->model.setTranslation(0.5, 3, -72);
+	PriestMan->model.scale(0.01, 0.01, 0.01);
+	PriestMan->name = "PriestMan";
+	Scene::instance->addEntity(PriestMan);
+
+	Entity* SalesMan = new Character(8,1, "data/biglib/NewCharacters/SalesMan.mesh", "data/biglib/WesternPack_renamed/texture4.tga", "data/gui/text.png", "data/gui/text.png", "data/biglib/breathing_idle2.skanim");
+	SalesMan->model.setTranslation(15, 0, -45);
+	Traveller->model.rotate(90 * DEG2RAD, Vector3(0, 1, 0));
+	SalesMan->model.scale(0.01, 0.01, 0.01);
+	SalesMan->name = "SalesMan";
+	Scene::instance->addEntity(SalesMan);
+
+	Entity* Thug = new Character(8, 1,"data/biglib/NewCharacters/Thug.mesh", "data/biglib/WesternPack_renamed/texture4.tga", "data/gui/text.png", "data/gui/text.png", "data/biglib/defeated.skanim");
+	Thug->model.setTranslation(9.5, 0, -38.5);
+	Thug->model.scale(0.01, 0.01, 0.01);
+	Thug->name = "Thug";
+	Scene::instance->addEntity(Thug);
+
 	
 	//Gui
 	Entity* title = new Gui("data/gui/title.png",false);

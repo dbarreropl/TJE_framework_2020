@@ -39,6 +39,8 @@ public:
 	bool game_over=false;
 	bool won=false;
 
+	float bootlesBroke = 0;
+
 	Vector3 velocity = Vector3(5.0f, 5.0f, 5.0f);
 	float movementVelocity = 3.0f;
 	float yaw = 0.0f;

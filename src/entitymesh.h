@@ -17,7 +17,7 @@ public:
 	Shader* shader;
 
 	BoundingBox box_world;
-
+	Matrix44 model2;
 	Vector4 color;
 
 	EntityMesh() {};

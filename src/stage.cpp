@@ -416,35 +416,36 @@ void PlayStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
 		this->current_stage = stages[4];
 	}
 
-	//Character* character= (Character*)Scene::instance->characters[5];
+	//Character* character= (Character*)Scene::instance->characters[7];
 	//character->model.setTranslation(player->x, player->y, player->z);
+	//character->model.scale(0.01, 0.01, 0.01);
 
 	//Entity* target= (Entity*)Scene::instance->targets[4];
 	//target->model.setTranslation(player->x, player->y, player->z);
 	//target->model.rotate(DEG2RAD * 90.0f, Vector3(0, 1, 0));
 	if (Input::wasKeyPressed(SDL_SCANCODE_T))
 	{
-		player->x += 0.1;
+		player->x += 0.5;
 	}
 	if (Input::wasKeyPressed(SDL_SCANCODE_Y))
 	{
-		player->x -= 0.1;
+		player->x -= 0.5;
 	}
 	if (Input::wasKeyPressed(SDL_SCANCODE_U))
 	{
-		player->y += 0.1;
+		player->y += 0.5;
 	}
 	if (Input::wasKeyPressed(SDL_SCANCODE_I))
 	{
-		player->y -= 0.1;
+		player->y -= 0.5;
 	}
 	if (Input::wasKeyPressed(SDL_SCANCODE_O))
 	{
-		player->z += 0.1;
+		player->z += 0.5;
 	}
 	if (Input::wasKeyPressed(SDL_SCANCODE_P))
 	{
-		player->z -= 0.1;
+		player->z -= 0.5;
 	}
 
 	//to read the gamepad state

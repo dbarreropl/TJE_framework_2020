@@ -133,6 +133,10 @@ void Scene::loadScene() {
 			entity->can_pickUp = true;
 			entity->name = "SM_Prop_Card";
 		}
+
+		if (!data_spl[0].find("SM_Prop_Bottle")) {
+			entity->name = "Bottle";
+		}
 	}
 	this->loaded = TRUE;
 

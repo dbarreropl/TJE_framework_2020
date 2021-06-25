@@ -250,7 +250,7 @@ void Player::shoot()
 		EntityMesh* current = (EntityMesh*)Scene::instance->characters[i];
 		Vector3 col;
 		Vector3 normal;
-		if (current->mesh->testRayCollision(current->model, origin, dir, col, normal, 10)) {
+		if (current->mesh->testRayCollision(current->model2, origin, dir, col, normal, 10)) {
 			entities.push_back(current);
 			collisions.push_back(col);
 			normals.push_back(normal);
@@ -285,6 +285,7 @@ void Player::shoot()
 		}
 	}
 
+	//kill character
 	if (entity && entity->type == 4) {
 		Character* character = (Character*)entity;
 		character->dead = TRUE;
@@ -294,12 +295,17 @@ void Player::shoot()
 		else
 			game_over = true;
 	}
+	//target
 	else if (entity && entity->name=="Target") {
 		entity->visible = FALSE;
 	}
+	//entity
 	else {
 		//create bullet hole
 		if (entity) {
+			if (entity->name == "Bottle")
+				this->bootlesBroke += 1; //bottle broke
+
 			Mesh* mesh = Mesh::Get("data/bullet.obj");
 			Texture* texture = Texture::Get("data/bullet2.png");
 			Shader* shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
