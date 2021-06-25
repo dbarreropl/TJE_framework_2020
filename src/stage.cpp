@@ -174,6 +174,10 @@ void PlayStage::render(std::vector<Stage*> stages) {
 		Scene::instance->bullet_holes[i]->render();
 	}
 
+	for (int i = 0; i < Scene::instance->targets.size(); i++) { //targets
+		Scene::instance->targets[i]->render();
+	}
+
 	player->render(); //player
 
 	for (int i = 0; i < Scene::instance->characters.size(); i++) { //characters
@@ -201,6 +205,7 @@ void PlayStage::render(std::vector<Stage*> stages) {
 	for (int i = 0; i < Scene::instance->characters.size(); i++) {
 		float dist = Scene::instance->characters[i]->model.getTranslation().distance(player->position_world());
 		character = (Character*)Scene::instance->characters[i];
+		character->condition(); //check mission condition, if true character done true
 		if (dist < 2) {
 			player->nearCharacter = true;
 			player->isTalking=isTalking;
@@ -208,6 +213,8 @@ void PlayStage::render(std::vector<Stage*> stages) {
 		}
 		if (character->talked)
 			character->active = TRUE;
+		//if(character->finish)
+			//character->active = FALSE;
 	}
 
 	if (player->nearCharacter) {
@@ -216,16 +223,35 @@ void PlayStage::render(std::vector<Stage*> stages) {
 			talk_key->render(width / 2, height / 1.2, width * 0.35, height * 0.35);
 		}
 		else {
-			if (character->active && character->condition()) {
-				character->text_done->render(width / 2, height / 1.3, width * 0.6, height * 0.3, false);
-				character->done = TRUE;
+			if (!text_playing) {
+				Audio::Play("data/audio/pop2.wav", 1000, false); //audio open text
+				text_playing = true;
+			}
+
+			if (character->active && character->done) {
+				character->text_done->render(width / 2, height / 1.3, width * 0.6, height * 0.3, false); //done text
+				player->mission_gui = character->mission_next;
+				character->finish = TRUE;
+				if (player->mission < character->mission+1)
+					player->mission = character->mission+1;
 			}
 			else {
-				character->text->render(width / 2, height / 1.3, width * 0.6, height * 0.3, false);
-				character->talked = TRUE;
-			}
+				if (player->mission == character->mission) {
+					character->text->render(width / 2, height / 1.3, width * 0.6, height * 0.3, false); //mission text
+					if (character->talked == FALSE)
+						character->onTalk();
+					character->talked = TRUE;
+				}
+				else
+					character->def->render(width / 2, height / 1.3, width * 0.6, height * 0.3, false); //default text
+			}	
 		}
+
 	}
+	else {
+		text_playing = false;
+	}
+	player->mission_gui->render(width / 2, height / 2, width, height, false); //mission text
 
 	if (player->nearObject) {
 		Gui* pick_up = (Gui*)Scene::instance->guis[9];
@@ -390,31 +416,35 @@ void PlayStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
 		this->current_stage = stages[4];
 	}
 
-	Character* character= (Character*)Scene::instance->characters[5];
+	//Character* character= (Character*)Scene::instance->characters[5];
 	//character->model.setTranslation(player->x, player->y, player->z);
+
+	//Entity* target= (Entity*)Scene::instance->targets[4];
+	//target->model.setTranslation(player->x, player->y, player->z);
+	//target->model.rotate(DEG2RAD * 90.0f, Vector3(0, 1, 0));
 	if (Input::wasKeyPressed(SDL_SCANCODE_T))
 	{
-		player->x += 0.05;
+		player->x += 0.1;
 	}
 	if (Input::wasKeyPressed(SDL_SCANCODE_Y))
 	{
-		player->x -= 0.05;
+		player->x -= 0.1;
 	}
 	if (Input::wasKeyPressed(SDL_SCANCODE_U))
 	{
-		player->y += 0.05;
+		player->y += 0.1;
 	}
 	if (Input::wasKeyPressed(SDL_SCANCODE_I))
 	{
-		player->y -= 0.05;
+		player->y -= 0.1;
 	}
 	if (Input::wasKeyPressed(SDL_SCANCODE_O))
 	{
-		player->z += 0.05;
+		player->z += 0.1;
 	}
 	if (Input::wasKeyPressed(SDL_SCANCODE_P))
 	{
-		player->z -= 0.05;
+		player->z -= 0.1;
 	}
 
 	//to read the gamepad state

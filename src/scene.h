@@ -21,18 +21,18 @@ public:
 	std::vector <Entity*> lights;
 	std::vector <Entity*> guis;
 	std::vector <Entity*> bullet_holes;
+	std::vector <Entity*> targets;
 	
 	bool loaded = FALSE;
 	bool init = false;
 
 	bool mode=1; //mode edit=0, mode play=1
 
-	//Shader* current_shader = NULL;
-
 	Scene();
 public:
 	void addEntity(Entity* Entity);
 	void addBulletHole(Entity* Entity);
+	void addTarget(Entity* Entity);
 	void loadScene();
 	void initGame();
 };

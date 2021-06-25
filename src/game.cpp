@@ -12,14 +12,7 @@
 #include <cmath>
 
 //some globals
-Mesh* mesh = NULL;
-Texture* texture = NULL;
-
-Mesh* player_mesh = NULL;
-Texture* player_texture = NULL;
-
 Shader* shader = NULL;
-Animation* anim = NULL;
 float angle = 0;
 float mouse_speed = 10.0f;
 FBO* fbo = NULL;
@@ -65,18 +58,44 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	Scene::instance = NULL;
 	new Scene();
 
-	//mesh = Mesh::Get("data/biglib/WesternPack/Envyrontment/SM_Env_Sand_Ground_06_47.obj");
-	//texture = Texture::Get("data/biglib/WesternPack/texture.tga");
 	shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
-	
 	Scene::instance->addEntity(camera);
 
 	//sky
 	Entity* sky = new EntityMesh("data/skydome.obj", "data/skydome.png");
-	sky->model.scale(24.973,24.973,24.973);
+	sky->model.scale(24.973, 24.973, 24.973);
 	sky->render_always = 1;
 	sky->setType(0);
 	Scene::instance->addEntity(sky);
+
+	//target
+	Entity* target = new EntityMesh("data/biglib/target/Target.obj", "data/biglib/target/Target.png");
+	target->model.setTranslation(-17.4,1.6,-7.4);
+	Scene::instance->addTarget(target);
+
+	Entity* target2 = new EntityMesh("data/biglib/target/Target.obj", "data/biglib/target/Target.png");
+	target2->model.setTranslation(15.1, 4.1, -12.9);
+	target2->model.rotate(DEG2RAD * 90.0f, Vector3(0, 1, 0));
+	Scene::instance->addTarget(target2);
+
+	Entity* target3 = new EntityMesh("data/biglib/target/Target.obj", "data/biglib/target/Target.png");
+	target3->model.setTranslation(15.6, 3.4, -35.5);
+	target3->model.rotate(DEG2RAD * 90.0f, Vector3(0, 1, 0));
+	Scene::instance->addTarget(target3);
+
+	Entity* target4 = new EntityMesh("data/biglib/target/Target.obj", "data/biglib/target/Target.png");
+	target4->model.setTranslation(-8.1, 2.7, -30);
+	Scene::instance->addTarget(target4);
+
+	Entity* target5 = new EntityMesh("data/biglib/target/Target.obj", "data/biglib/target/Target.png");
+	target5->model.setTranslation(7.4, 4.5, 10.7);
+	target5->model.rotate(DEG2RAD * 90.0f, Vector3(0, 1, 0));
+	Scene::instance->addTarget(target5);
+
+	for (int i = 0; i < Scene::instance->targets.size(); i++) { //targets
+		Scene::instance->targets[i]->name= "Target";
+		Scene::instance->targets[i]->visible = FALSE;
+	}
 
 	//player
 	Entity* player = new Player("data/biglib/character.mesh", "data/biglib/WesternPack_renamed/texture.tga");
@@ -89,41 +108,45 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	player_s->initialPos = initialPos;
 
 	//characters
-	Entity* BusinessMan = new Character("data/biglib/Characters/Business_Man.mesh", "data/gui/BusinessMan.png", "data/gui/BusinessMan_done.png", "data/biglib/old_man_idle.skanim");
+	Entity* BusinessMan = new Character(2,"data/biglib/Characters/Business_Man.mesh", "data/gui/BusinessMan.png", "data/gui/BusinessMan_done.png", "data/biglib/old_man_idle.skanim");
 	BusinessMan->model.setTranslation(4.700, 0, 4.400);
 	BusinessMan->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
 	BusinessMan->name = "BusinessMan";
 	Scene::instance->addEntity(BusinessMan);
+	Character* BusinessMan_character = (Character*)Scene::instance->characters.back();
+	BusinessMan_character->setMissionGui("data/gui/BusinessMan_mission_in.png", "data/gui/BusinessMan_mission_next.png", "data/gui/BusinessMan_mission_done.png");
 
-	Entity* CowBoy = new Character("data/biglib/Characters/CowBoy.mesh", "data/gui/text.png", "data/gui/text.png", "data/biglib/arm_stretching.skanim");
+	Entity* CowBoy = new Character(3,"data/biglib/Characters/CowBoy.mesh", "data/gui/text.png", "data/gui/text.png", "data/biglib/arm_stretching.skanim");
 	CowBoy->model.setTranslation(12.800, 0, -12.4);
 	CowBoy->model.rotate(DEG2RAD * 90.f, Vector3(0.0f, 1.0f, 0.0f));
 	CowBoy->name = "CowBoy";
 	Scene::instance->addEntity(CowBoy);
 
-	Entity* CowGirl = new Character("data/biglib/Characters/CowGirl.mesh", "data/gui/text.png", "data/gui/text.png", "data/biglib/briefcase_idle.skanim");
+	Entity* CowGirl = new Character(4,"data/biglib/Characters/CowGirl.mesh", "data/gui/text.png", "data/gui/text.png", "data/biglib/briefcase_idle.skanim");
 	CowGirl->model.setTranslation(-2.2, 0, -13.9);
 	CowGirl->name = "CowGirl";
 	Scene::instance->addEntity(CowGirl);
 
-	Entity* GunMan = new Character("data/biglib/Characters/GunMan.mesh", "data/gui/text.png", "data/gui/text.png", "data/biglib/sitting.skanim");
+	Entity* GunMan = new Character(5,"data/biglib/Characters/GunMan.mesh", "data/gui/text.png", "data/gui/text.png", "data/biglib/sitting.skanim");
 	GunMan->model.setTranslation(8.7, 0.2, -19.4);
 	GunMan->name = "GunMan";
 	Scene::instance->addEntity(GunMan);
 
-	Entity* Sheriff = new Character("data/biglib/Characters/Sheriff.mesh", "data/gui/text.png", "data/gui/text.png", "data/biglib/drunk_idle.skanim");
+	Entity* Sheriff = new Character(1,"data/biglib/Characters/Sheriff.mesh", "data/gui/Sheriff.png","data/gui/Sheriff_done.png", "data/biglib/drunk_idle.skanim");
 	Sheriff->model.setTranslation(3.8, 0, -37.9);
 	Sheriff->model.rotate(DEG2RAD * 90.f, Vector3(0.0f, 1.0f, 0.0f));
 	Sheriff->name = "Sheriff";
 	Scene::instance->addEntity(Sheriff);
+	Character* Sheriff_character = (Character*)Scene::instance->characters.back();
+	Sheriff_character->setMissionGui("data/gui/Sheriff_mission_in.png", "data/gui/Sheriff_mission_next.png","data/gui/Sheriff_mission_done.png");
 
-	Entity* Woman = new Character("data/biglib/Characters/Woman.mesh", "data/gui/text.png", "data/gui/text.png", "data/biglib/breathing_idle.skanim");
+	Entity* Woman = new Character(6,"data/biglib/Characters/Woman.mesh", "data/gui/text.png", "data/gui/text.png", "data/biglib/breathing_idle.skanim");
 	Woman->model.setTranslation(-9.700, 0, -38.49);
 	Woman->model.rotate(DEG2RAD * 180.f, Vector3(0.0f, 1.0f, 0.0f));
 	Woman->name = "Woman";
 	Scene::instance->addEntity(Woman);
 
-	Entity* WorkingGirl = new Character("data/biglib/Characters/WorkingGirl.mesh", "data/gui/text.png", "data/gui/text.png", "data/biglib/jazz_dancing.skanim");
+	Entity* WorkingGirl = new Character(7,"data/biglib/Characters/WorkingGirl.mesh", "data/gui/text.png", "data/gui/text.png", "data/biglib/jazz_dancing.skanim");
 	WorkingGirl->model.setTranslation(-17.2, 0.5, -13.4);
 	WorkingGirl->model.rotate(DEG2RAD * 270.f, Vector3(0.0f, 1.0f, 0.0f));
 	WorkingGirl->name = "WorkingGirl";

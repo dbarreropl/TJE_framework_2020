@@ -12,29 +12,44 @@ public:
 	Animation* idle;
 	Animation* die;
 
+	Gui* def;
 	Gui* text;
 	Gui* text_done;
+
+	Gui* mission_in;
+	Gui* mission_done;
+	Gui* mission_next;
 
 	bool talked = FALSE;
 	bool active=FALSE;
 	bool done=FALSE;
 	bool dead = FALSE;
+	bool finish = FALSE;
 	float time_dead;
+	float mission;
 
-	Character(const char* mesh, const char* text, const char* text_done, const char* idle)
+	Character(float mission, const char* mesh, const char* text, const char* text_done, const char* idle)
 		: EntityMesh(mesh, "data/biglib/WesternPack_renamed/texture.tga") {
 		
 		this->setType(4);
+		this->mission = mission;
 		this->render_always = 1;
 		this->idle = Animation::Get(idle);
 		this->die = Animation::Get("data/biglib/die.skanim");
 		this->text = new Gui(text, false);
 		this->text_done = new Gui(text_done, false);
+		this->def= new Gui("data/gui/text.png", false);
 		shader = Shader::Get("data/shaders/skinning.vs", "data/shaders/texture.fs");
 	}
 	
 	void render();
-	bool condition();
+	void condition();
+	void onTalk();
 
+	void setMissionGui(const char* mission_in, const char* mission_next, const char* mission_done) {
+		this->mission_in = new Gui(mission_in, false);
+		this->mission_next = new Gui(mission_next, false);
+		this->mission_done = new Gui(mission_done, false);
+	}
 };
 

@@ -3,14 +3,17 @@
 #include "framework.h"
 #include "entitymesh.h"
 #include "entity.h"
+#include "gui.h"
 
 class Player : public EntityMesh
 {
 public:
-	float x=0.3, y=-0.35, z=1.15;
+	float x = 0, y = 0, z = 0;
 	Vector3 initialPos;
 	Vector3 targetMove;
 	std::vector <Entity*> objects;
+
+	Gui* mission_gui;
 
 	Animation* walk;
 	Animation* shot;
@@ -32,6 +35,7 @@ public:
 	bool canShoot = true;
 	bool nearCharacter = false;
 	bool nearObject = false;
+	float mission = 1;
 	bool game_over=false;
 	bool won=false;
 
@@ -53,6 +57,8 @@ public:
 		reload = Animation::Get("data/biglib/reload.skanim");
 		walk = Animation::Get("data/biglib/walking.skanim");
 		shader = Shader::Get("data/shaders/skinning.vs", "data/shaders/texture.fs");
+
+		mission_gui = new Gui("data/gui/first_mission.png", false);
 	}
 
 	void render();

@@ -41,14 +41,40 @@ void Character::render()
 	}
 }
 
-bool Character::condition()
+void Character::condition()
 {
 	Player* player = (Player*)Scene::instance->players[0];
+	bool condition = false;
 
 	if (this->name == "BusinessMan") {
 		if (player->numberObjects("SM_Prop_Card") > 8)
-			return true;
+			condition = true;
 		else
-			return false;
+			condition = false;
+	}
+
+	if (this->name == "Sheriff" && this->active) {
+		condition = true;
+		for (int i = 0; i < Scene::instance->targets.size(); i++) { //targets
+			if (Scene::instance->targets[i]->visible)
+				condition = false;
+		}
+	}
+
+	this->done = condition;
+	if (condition && !finish) {
+		player->mission_gui = this->mission_done;
+	}
+
+}
+
+void Character::onTalk()
+{
+	Player* player = (Player*)Scene::instance->players[0];
+	player->mission_gui = this->mission_in;
+	if (this->name == "Sheriff") {
+		for (int i = 0; i < Scene::instance->targets.size(); i++) { //targets
+			Scene::instance->targets[i]->visible = TRUE;
+		}
 	}
 }

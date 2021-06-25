@@ -81,6 +81,7 @@ public:
 
 	STAGE actual_stage = (STAGE)2;
 	bool music_playing = false;
+	bool text_playing = false;
 	float wait=0;
 	bool aux=false;
 

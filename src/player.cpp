@@ -44,11 +44,17 @@ void Player::render()
 		//walk->assignTime(0, RIGHT_ARM);
 
 		//gun
-		//Vector3 Center = (camera->center - camera->eye).normalize();
-		//Vector3 pos = camera->eye + (Center * 1.0f);
+		//Vector3 center = (camera->center - camera->eye).normalize();
+		//Vector3 pos = camera->eye + center;
 		Matrix44& RightHand = result.getBoneMatrix("mixamorig_RightHand", false);
-		RightHand.rotate(pitch, Vector3(x, y, z));
-		RightHand.translate(0,-pitch*0.04,0);
+		RightHand.rotate(0.2, Vector3(0.3, -0.35, 1.12));
+		RightHand.rotate(pitch*0.8, Vector3(0.3, -0.35, 1.12));
+
+		RightHand.translate(0,-pitch*0.04,0);		
+
+		if (pitch > 0.1) {
+			RightHand.translate((pitch - 0.1) * -0.2, (pitch-0.1) * 0.4, 0);
+		}
 
 		//Matrix44& RightForeArm = result.getBoneMatrix("mixamorig_RightArm", false);
 		//RightForeArm.translate(0, -pitch * 0.5, 0);
@@ -59,7 +65,7 @@ void Player::render()
 		gun.model.rotate(70 * DEG2RAD, Vector3(0, 0, 1));
 		gun.model.rotate(55 * DEG2RAD, Vector3(0, 1, 0));
 		//gun.model.rotate(time * 100 * DEG2RAD, Vector3(1, 0, 0));
-		//gun.model.setTranslation(pos.x, pos.y, pos.z); //...
+		//gun.model.setTranslation(pos.x, pos.y, pos.z);
 		gun.render();
 
 		//shader = Shader::current;
@@ -251,6 +257,18 @@ void Player::shoot()
 		}
 	}
 
+	//target colision
+	for (int i = 0; i < Scene::instance->targets.size(); i++) {
+		EntityMesh* current = (EntityMesh*)Scene::instance->targets[i];
+		Vector3 col;
+		Vector3 normal;
+		if (current->mesh->testRayCollision(current->model, origin, dir, col, normal, 10)) {
+			entities.push_back(current);
+			collisions.push_back(col);
+			normals.push_back(normal);
+		}
+	}
+
 	//near entity
 	Vector3 pos = this->model.getTranslation();
 	Entity* entity = NULL;
@@ -275,6 +293,9 @@ void Player::shoot()
 			won = true;
 		else
 			game_over = true;
+	}
+	else if (entity && entity->name=="Target") {
+		entity->visible = FALSE;
 	}
 	else {
 		//create bullet hole

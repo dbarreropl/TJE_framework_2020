@@ -21,7 +21,10 @@ void Scene::initGame()
 	}
 	for (int i = 0; i < Scene::instance->entities.size(); i++) {
 		EntityMesh* current = (EntityMesh*)Scene::instance->entities[i];
-		current->visible = TRUE;
+		if(current->name=="Target")
+			current->visible = TRUE;
+		else
+			current->visible = TRUE;
 	}
 
 	//bullet holes
@@ -34,6 +37,18 @@ void Scene::initGame()
 		object->number = 1;
 	}
 
+	//missions
+	player->mission = 1;
+	player->mission_gui = new Gui("data/gui/first_mission.png", false);
+
+	for (int i = 0; i < Scene::instance->characters.size(); i++) {
+		Character* character = (Character*)Scene::instance->characters[i];
+		character->talked = FALSE;
+		character->active = FALSE;
+		character->done = FALSE;
+		character->dead = FALSE;
+		character->finish = FALSE;
+	}
 
 	init = TRUE;
 }
@@ -64,6 +79,10 @@ void Scene::addEntity(Entity* Entity){
 
 void Scene::addBulletHole(Entity* Entity) {
 	Scene::instance->bullet_holes.push_back(Entity);
+}
+
+void Scene::addTarget(Entity* Entity) {
+	Scene::instance->targets.push_back(Entity);
 }
 
 void Scene::loadScene() {
