@@ -151,6 +151,37 @@ bool Player::testCollision(EntityMesh* entity, Vector3 targetMove) {
 	}
 }
 
+void Player::floorCollision()
+{
+	float dist_obj2 = 0;
+	//lanzar rayo de pies a abajo, si distancia es mas grande que 0.1 bajar -0.05, si es mas pequeño hacer push away
+	Vector3 pos = this->model.getTranslation(); //this->position_world()
+	Vector3 characterTargetCenter = pos + this->targetMove + Vector3(0.0f, 0.2f, 0.0f);
+	Vector3 dir = Vector3(0.0f, -5.0f, 0.0f);
+	float near_y = 10;
+	for (int i = 1; i < Scene::instance->entities.size(); i++) {
+		EntityMesh* entity = (EntityMesh*)Scene::instance->entities[i];
+		Vector3 col;
+		Vector3 normal;
+		if (entity->visible == TRUE)
+			if (entity->mesh->testRayCollision(entity->model, pos, dir, col, normal, 10)) {
+				float dist_obj = pos.y - (col.y + normal.y);
+				dist_obj2 = dist_obj;
+				if (dist_obj < near_y)
+					near_y = dist_obj;
+			}
+	}
+
+	//near_y = clamp(near_y,0,1);
+	if (near_y > this->height_floor && pos.y > 0.1)
+		this->targetMove.y = -2.5* Game::instance->elapsed_time;
+
+	if (pos.y < 0)
+		this->targetMove.y = 0.1;
+
+	//std::cout << dist_obj2 << std::endl;
+}
+
 void Player::pickUp()
 {
 	Player* player = (Player*)Scene::instance->players[0];
@@ -298,48 +329,54 @@ void Player::shoot()
 	//target
 	else if (entity && entity->name=="Target") {
 		entity->visible = FALSE;
+		Audio::Play("data/audio/hit.mp3", 2000, false);
 	}
 	//entity
 	else {
 		//create bullet hole
 		if (entity) {
-			if (entity->name == "Bottle")
+			if (entity->name == "Bottle"){
 				this->bootlesBroke += 1; //bottle broke
+				Audio::Play("data/audio/bottle_break.mp3", 2000, false);
+				entity->visible = FALSE;
+			}
+			else {
 
-			Mesh* mesh = Mesh::Get("data/bullet.obj");
-			Texture* texture = Texture::Get("data/bullet2.png");
-			Shader* shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
-			EntityMesh* entity_sh = new EntityMesh();
-			entity_sh->mesh = mesh;
-			entity_sh->texture = texture;
-			entity_sh->shader = shader;
-			entity_sh->visible = TRUE;
+				Mesh* mesh = Mesh::Get("data/bullet.obj");
+				Texture* texture = Texture::Get("data/bullet2.png");
+				Shader* shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+				EntityMesh* entity_sh = new EntityMesh();
+				entity_sh->mesh = mesh;
+				entity_sh->texture = texture;
+				entity_sh->shader = shader;
+				entity_sh->visible = TRUE;
 
-			//hole near player
-			if (pos.x > entity_col.x)
-				entity_col.x = entity_col.x + 0.01;
-			else
-				entity_col.x = entity_col.x - 0.01;
-			if (pos.y > entity_col.y)
-				entity_col.y = entity_col.y + 0.01;
-			else
-				entity_col.y = entity_col.y - 0.01;
-			if (pos.z > entity_col.z)
-				entity_col.z = entity_col.z + 0.01;
-			else
-				entity_col.z = entity_col.z - 0.01;
+				//hole near player
+				if (pos.x > entity_col.x)
+					entity_col.x = entity_col.x + 0.01;
+				else
+					entity_col.x = entity_col.x - 0.01;
+				if (pos.y > entity_col.y)
+					entity_col.y = entity_col.y + 0.01;
+				else
+					entity_col.y = entity_col.y - 0.01;
+				if (pos.z > entity_col.z)
+					entity_col.z = entity_col.z + 0.01;
+				else
+					entity_col.z = entity_col.z - 0.01;
 
-			//error normalize lenght
-			if (abs(entity_normal.x) < 0.000001)
-				entity_normal.x = 0.000001;
-			if (abs(entity_normal.y) < 0.000001)
-				entity_normal.y = 0.000001;
-			if (abs(entity_normal.z) < 0.000001)
-				entity_normal.z = 0.000001;
+				//error normalize lenght
+				if (abs(entity_normal.x) < 0.000001)
+					entity_normal.x = 0.000001;
+				if (abs(entity_normal.y) < 0.000001)
+					entity_normal.y = 0.000001;
+				if (abs(entity_normal.z) < 0.000001)
+					entity_normal.z = 0.000001;
 
-			entity_sh->model.setTranslation(entity_col.x, entity_col.y, entity_col.z);
-			entity_sh->model.setFrontAndOrthonormalize(entity_normal);
-			Scene::instance->addBulletHole(entity_sh);
+				entity_sh->model.setTranslation(entity_col.x, entity_col.y, entity_col.z);
+				entity_sh->model.setFrontAndOrthonormalize(entity_normal);
+				Scene::instance->addBulletHole(entity_sh);
+			}
 		}
 	}
 }

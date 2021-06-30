@@ -11,16 +11,13 @@ Stage::Stage()
 void IntroStage::render(std::vector<Stage*> stages) {
 	float width = Game::instance->window_width;
 	float height = Game::instance->window_height;
-	Gui* loading = (Gui*)Scene::instance->guis[5];
+	Gui* loading = new Gui("data/gui/loading2.png", false);
 	loading->render(width / 2, height / 2, width, height);
-	//drawText(100, 450, "LOADING...", Vector3(1, 1, 1), 8);
-
 }
 
 void IntroStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
 	Scene::instance->loadScene();
 	this->current_stage = stages[3];
-
 }
 
 //Tutorial
@@ -29,18 +26,16 @@ void TutoStage::render(std::vector<Stage*> stages) {
 
 	float width = Game::instance->window_width;
 	float height = Game::instance->window_height;
+
 	Gui* paper = (Gui*)Scene::instance->guis[2];
 	paper->render(width / 2, height / 2, width * 0.5, height * 0.7);
 	Gui* close = (Gui*)Scene::instance->guis[32];
 	close->render(width / 1.44, height / 4.3, width * 0.1, height * 0.1,true);
-
 	Gui* tutorial = (Gui*)Scene::instance->guis[33];
 	tutorial->render(width / 1.9, height / 1.75, width, height, false);
-
 }
 
 void TutoStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
-
 	Gui* close = (Gui*)Scene::instance->guis[32];
 	if ((Input::mouse_state & SDL_BUTTON_RIGHT) && close->hover)
 	{
@@ -197,15 +192,20 @@ void PlayStage::render(std::vector<Stage*> stages) {
 		scope->render(screen_x, screen_y, width, height, false);
 	}
 
-	//talk to a character
+	//condition mission
 	Character* character;
+	for (int i = 0; i < Scene::instance->characters.size(); i++) {
+		character = (Character*)Scene::instance->characters[i];
+		character->condition(); //check mission condition, if true character done true
+	}
+
+	//talk to a character
 	player->nearCharacter = false;
 	bool isTalking = player->isTalking;
 	player->isTalking=false;
 	for (int i = 0; i < Scene::instance->characters.size(); i++) {
 		float dist = Scene::instance->characters[i]->model.getTranslation().distance(player->position_world());
 		character = (Character*)Scene::instance->characters[i];
-		character->condition(); //check mission condition, if true character done true
 		if (dist < 2) {
 			player->nearCharacter = true;
 			player->isTalking=isTalking;
@@ -339,28 +339,7 @@ void PlayStage::update(double seconds_elapsed, std::vector<Stage*> stages) {
 				player->onCollision(entity);
 	}
 	
-	//lanzar rayo de pies a abajo, si distancia es mas grande que 0.1 bajar -0.05, si es mas pequeño hacer push away
-	Vector3 pos = player->model.getTranslation(); //this->position_world()
-	Vector3 characterTargetCenter = pos + player->targetMove + Vector3(0.0f, 0.2f, 0.0f);
-	Vector3 dir = Vector3(0.0f, -5.0f, 0.0f);
-	float near_y = 10;
-	for (int i = 1; i < Scene::instance->entities.size(); i++) {
-		EntityMesh* entity = (EntityMesh*)Scene::instance->entities[i];
-		Vector3 col;
-		Vector3 normal;
-		if (entity->visible == TRUE)
-			if (entity->mesh->testRayCollision(entity->model, pos, dir, col, normal, 10)) {
-				float dist_obj = pos.y-(col.y + normal.y);
-				if (dist_obj < near_y)
-					near_y = dist_obj;
-			}
-	}
-	
-	//near_y = clamp(near_y,0,1);
-	if (near_y > player->height_floor && pos.y>0.1)
-			player->targetMove.y = -0.05;
-
-	//std::cout << near_y << std::endl;
+	player->floorCollision();
 
 	player->model.rotate((player->yaw), Vector3(0.0f, -1.0f, 0.0f));
 	player->movePlayer(player->targetMove);

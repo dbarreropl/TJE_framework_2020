@@ -2,6 +2,7 @@
 #include "scene.h"
 #include "game.h"
 #include "input.h"
+#include "audio.h"
 
 void Character::render()
 {
@@ -66,8 +67,17 @@ void Character::condition()
 	bool condition = false;
 
 	if (this->name == "BusinessMan") {
-		if (player->numberObjects("SM_Prop_Card") > 8)
+		if (player->numberObjects("SM_Prop_Card") > 8) {
 			condition = true;
+			if (finish && player->nearCharacter==FALSE) {
+				std::vector <Entity*> objects;
+				for (int i = 0; i < player->objects.size(); i++) {
+					if (player->objects[i]->name != "SM_Prop_Card")
+						objects.push_back(player->objects[i]);
+				}
+				player->objects = objects;
+			}
+		}
 		else
 			condition = false;
 	}
@@ -87,6 +97,10 @@ void Character::condition()
 	this->done = condition;
 	if (condition && !finish) {
 		player->mission_gui = this->mission_done;
+		if (!sound_completed) {
+			Audio::Play("data/audio/task_done.mp3", 1000, false);
+			sound_completed = TRUE;
+		}
 	}
 
 }

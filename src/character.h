@@ -29,6 +29,7 @@ public:
 	float mission;
 
 	bool pos_dead = FALSE;
+	bool sound_completed = FALSE;
 
 	Character(float mission, bool isNew, const char* mesh, const char* texture, const char* text, const char* text_done, const char* idle)
 		: EntityMesh(mesh, texture) {

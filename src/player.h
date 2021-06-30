@@ -68,6 +68,7 @@ public:
 	void updateCamera();
 	void onCollision(Entity* entity);
 	bool testCollision(EntityMesh* entity, Vector3 targetMove);
+	void floorCollision();
 
 	void pickUp();
 	void addObject(Entity* entity);

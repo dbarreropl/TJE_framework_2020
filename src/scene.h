@@ -33,6 +33,11 @@ public:
 	void addEntity(Entity* Entity);
 	void addBulletHole(Entity* Entity);
 	void addTarget(Entity* Entity);
-	void loadScene();
+
 	void initGame();
+	
+	void loadCharacters();
+	void loadGui();
+	void loadTargets();
+	void loadScene();
 };
